@@ -26,7 +26,10 @@ class ArtistDetailsScreen extends StatelessWidget {
       return Column(
         children: [
           for (int i = 0; i < count; i++)
-            SongItem(song: filteredSongs[i], index: i)
+            SongItem(
+              song: filteredSongs[i],
+              index: i,
+            )
         ],
       );
     }

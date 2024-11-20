@@ -15,7 +15,11 @@ class RankingScreen extends StatelessWidget {
       itemCount: sortedSongs.length,
       itemBuilder: (context, index) {
         final song = sortedSongs[index];
-        return SongItem(song: song, index: index);
+        return SongItem(
+          song: song,
+          index: index,
+          showArtists: true,
+        );
       }
     );
   }
