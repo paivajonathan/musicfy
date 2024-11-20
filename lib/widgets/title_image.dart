@@ -6,7 +6,7 @@ class TitleImage extends StatelessWidget {
   const TitleImage({
     super.key,
     required this.artist,
-    required this.isHeader,
+    this.isHeader = false,
   });
 
   final Artist artist;

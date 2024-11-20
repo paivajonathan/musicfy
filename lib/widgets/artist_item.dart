@@ -25,7 +25,7 @@ class ArtistItem extends StatelessWidget {
             )
           );
         },
-        child: TitleImage(artist: artist, isHeader: false),
+        child: TitleImage(artist: artist),
       ),
     );
   }
