@@ -32,8 +32,7 @@ class AboutScreen extends StatelessWidget {
           _selectDrawerScreen(context, identifier);
         },
       ),
-      body: Container(
-        width: double.infinity,
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
         child: Column(
           children: [
@@ -86,8 +85,8 @@ class AboutScreen extends StatelessWidget {
               "Instituto Federal do Piauí - Campus Parnaíba",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge!,
-            ),       
-            const Spacer(),
+            ),
+            const SizedBox(height: 20),    
             Text(
               "© 2024",
               style: Theme.of(context).textTheme.bodyLarge!,
