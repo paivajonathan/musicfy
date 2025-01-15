@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho1/screens/about.dart';
+import 'package:trabalho1/screens/add_artist.dart';
 import 'package:trabalho1/screens/artists.dart';
 import 'package:trabalho1/screens/ranking.dart';
 import 'package:trabalho1/widgets/main_drawer.dart';
@@ -29,10 +30,7 @@ class _TabsScreenState extends State<TabsScreen> {
     switch (identifier) {
       case "sobre":
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const AboutScreen()
-          )
-        );
+            MaterialPageRoute(builder: (context) => const AboutScreen()));
       default:
         Navigator.of(context).pop();
     }
@@ -49,6 +47,17 @@ class _TabsScreenState extends State<TabsScreen> {
         title: Text(_navigationScreens[_activeNavigationScreenIndex]["title"]),
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.transparent,
+        actions: [
+          if (_activeNavigationScreenIndex == 0)
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const AddArtistScreen()),
+                );
+              },
+              icon: const Icon(Icons.add),
+            )
+        ],
       ),
       drawer: MainDrawer(
         onSelectedScreen: (identifier) {
