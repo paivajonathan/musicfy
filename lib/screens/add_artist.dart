@@ -20,12 +20,18 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
   var _enteredFollowersQuantity = 0;
   var _enteredImageURL = "";
 
+  bool _isButtonLoading = false;
+
   Future<void> _saveArtist() async {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
     try {
+      setState(() {
+        _isButtonLoading = true;
+      });
+
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
         'artists.json',
@@ -53,6 +59,10 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() {
+        _isButtonLoading = false;
+      });
     }
   }
 
@@ -146,9 +156,18 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                       _enteredImageURL = value!;
                     },
                   ),
+                  const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () => _saveArtist(),
-                    child: const Text('Adicionar'),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(MediaQuery.of(context).size.width, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    onPressed: _isButtonLoading ? null : () => _saveArtist(),
+                    child: _isButtonLoading
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+                        : const Text('Adicionar'),
                   ),
                 ],
               ),

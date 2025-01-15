@@ -10,17 +10,20 @@ class RankingScreen extends StatelessWidget {
     final sortedSongs = songs;
     sortedSongs.sort((a, b) => b.streamsCount.compareTo(a.streamsCount));
 
-    return ListView.builder(
-      padding: EdgeInsets.zero,
-      itemCount: sortedSongs.length,
-      itemBuilder: (context, index) {
-        final song = sortedSongs[index];
-        return SongItem(
-          song: song,
-          index: index,
-          showArtists: true,
-        );
-      }
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: sortedSongs.length,
+        itemBuilder: (context, index) {
+          final song = sortedSongs[index];
+          return SongItem(
+            song: song,
+            index: index,
+            showArtists: true,
+          );
+        }
+      ),
     );
   }
 }

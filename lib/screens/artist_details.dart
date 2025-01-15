@@ -159,14 +159,11 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                         (a, b) => b.streamsCount.compareTo(a.streamsCount),
                       );
 
-                      return ListView.builder(
-                        itemCount: _songs.length,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) {
-                          final song = _songs[index];
-                          return SongItem(song: song, index: index);
-                        },
+                      return Column(
+                        children: [
+                          for (final (index, song) in _songs.indexed)
+                            SongItem(song: song, index: index)
+                        ],
                       );
                     },
                   ),

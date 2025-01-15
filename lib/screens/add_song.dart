@@ -25,12 +25,18 @@ class _AddSongScreenState extends State<AddSongScreen> {
   var _enteredTitle = "";
   var _enteredStreamsCount = 0;
 
+  bool _isButtonLoading = false;
+
   Future<void> _saveSong() async {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
     try {
+      setState(() {
+        _isButtonLoading = true;
+      });
+
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
         'songs.json',
@@ -58,6 +64,10 @@ class _AddSongScreenState extends State<AddSongScreen> {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() {
+        _isButtonLoading = false;
+      });
     }
   }
 
@@ -116,9 +126,18 @@ class _AddSongScreenState extends State<AddSongScreen> {
                       _enteredStreamsCount = int.parse(value!);
                     },
                   ),
+                  const SizedBox(height: 20,),
                   ElevatedButton(
-                    onPressed: () => _saveSong(),
-                    child: const Text('Adicionar'),
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(MediaQuery.of(context).size.width, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    onPressed: _isButtonLoading ? null : () => _saveSong(),
+                    child: _isButtonLoading
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+                        : const Text('Adicionar'),
                   ),
                 ],
               ),
