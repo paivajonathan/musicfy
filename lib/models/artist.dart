@@ -1,5 +1,5 @@
-class Artist {
-  Artist({
+class ArtistModel {
+  ArtistModel({
     required this.id,
     required this.name,
     required this.imageUrl,
@@ -7,7 +7,7 @@ class Artist {
     required this.description,
   });
 
-  int id;
+  String id;
   String name;
   String imageUrl;
   int followers;

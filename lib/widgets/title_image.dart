@@ -9,7 +9,7 @@ class TitleImage extends StatelessWidget {
     this.isHeader = false,
   });
 
-  final Artist artist;
+  final ArtistModel artist;
   final bool isHeader;
 
   @override

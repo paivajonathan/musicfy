@@ -9,7 +9,7 @@ class ArtistItem extends StatelessWidget {
     required this.artist,
   });
 
-  final Artist artist;
+  final ArtistModel artist;
 
   @override
   Widget build(BuildContext context) {

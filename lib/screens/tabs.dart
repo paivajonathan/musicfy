@@ -15,16 +15,6 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   int _activeNavigationScreenIndex = 0;
-  final List<Map<String, dynamic>> _navigationScreens = [
-    {
-      "title": "Artistas",
-      "content": const ArtistsScreen(),
-    },
-    {
-      "title": "Ranking",
-      "content": const RankingScreen(),
-    },
-  ];
 
   void _selectDrawerScreen(BuildContext context, String identifier) {
     switch (identifier) {
@@ -42,22 +32,34 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> _navigationScreens = [
+      {
+        "title": "Artistas",
+        "content": const ArtistsScreen(),
+        "actions": [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => const AddArtistScreen()),
+              );
+            },
+            icon: const Icon(Icons.add),
+          )
+        ],
+      },
+      {
+        "title": "Ranking",
+        "content": const RankingScreen(),
+        "actions": null,
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_navigationScreens[_activeNavigationScreenIndex]["title"]),
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.transparent,
-        actions: [
-          if (_activeNavigationScreenIndex == 0)
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const AddArtistScreen()),
-                );
-              },
-              icon: const Icon(Icons.add),
-            )
-        ],
+        actions: _navigationScreens[_activeNavigationScreenIndex]["actions"],
       ),
       drawer: MainDrawer(
         onSelectedScreen: (identifier) {

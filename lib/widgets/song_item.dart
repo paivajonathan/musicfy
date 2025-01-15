@@ -10,7 +10,7 @@ class SongItem extends StatelessWidget {
     this.showArtists = false,
   });
 
-  final Song song;
+  final SongModel song;
   final int index;
   final bool showArtists;
 
@@ -18,22 +18,20 @@ class SongItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final subtitle = formatNumber(song.streamsCount) + (
       showArtists
-      ? " | ${song.artistsNames.join(", ")}"
+      ? " | ${song.artistName}"
       : ""
     );
 
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: ListTile(
-        leading: Text((index + 1).toString(), style: const TextStyle(fontSize: 20)),
-        title: Text(song.title),
-        subtitle: Text(
-          subtitle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: const Icon(Icons.favorite_border),
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Text((index + 1).toString(), style: const TextStyle(fontSize: 20)),
+      title: Text(song.title),
+      subtitle: Text(
+        subtitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
+      trailing: const Icon(Icons.favorite_border),
     );
   }
 }

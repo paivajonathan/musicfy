@@ -5,22 +5,27 @@ import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
 
-class AddArtistScreen extends StatefulWidget {
-  const AddArtistScreen({super.key});
+class AddSongScreen extends StatefulWidget {
+  const AddSongScreen({
+    super.key,
+    required this.artistId,
+    required this.artistName,
+  });
+
+  final String artistId;
+  final String artistName;
 
   @override
-  State<AddArtistScreen> createState() => _AddArtistScreenState();
+  State<AddSongScreen> createState() => _AddSongScreenState();
 }
 
-class _AddArtistScreenState extends State<AddArtistScreen> {
+class _AddSongScreenState extends State<AddSongScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  var _enteredName = "";
-  var _enteredDescription = "";
-  var _enteredFollowersQuantity = 0;
-  var _enteredImageURL = "";
+  var _enteredTitle = "";
+  var _enteredStreamsCount = 0;
 
-  Future<void> _saveArtist() async {
+  Future<void> _saveSong() async {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
@@ -28,7 +33,7 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
     try {
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
-        'artists.json',
+        'songs.json',
       );
 
       final response = await http.post(
@@ -38,10 +43,10 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
         },
         body: json.encode(
           {
-            'name': _enteredName,
-            'description': _enteredDescription,
-            'followersQuantity': _enteredFollowersQuantity,
-            'imageURL': _enteredImageURL,
+            'title': _enteredTitle,
+            'streamsCount': _enteredStreamsCount,
+            'artistId': widget.artistId,
+            'artistName': widget.artistName,
           },
         ),
       );
@@ -64,7 +69,7 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Adicionar Artista"),
+          title: const Text("Adicionar Música"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -76,7 +81,7 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                   TextFormField(
                     maxLength: 50,
                     decoration: const InputDecoration(
-                      label: Text('Nome'),
+                      label: Text('Título'),
                     ),
                     validator: (value) {
                       if (value == null ||
@@ -87,32 +92,15 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                       return null;
                     },
                     onSaved: (value) {
-                      _enteredName = value!;
-                    },
-                  ),
-                  TextFormField(
-                    maxLength: 500,
-                    decoration: const InputDecoration(
-                      label: Text('Descrição'),
-                    ),
-                    validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          value.trim().length > 500) {
-                        return 'Deve ter entre 1 e 500 caracteres';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredDescription = value!;
+                      _enteredTitle = value!;
                     },
                   ),
                   TextFormField(
                     maxLength: 10,
                     decoration: const InputDecoration(
-                      label: Text('Qtd. de seguidores'),
+                      label: Text('Cont. de Streams'),
                     ),
-                    initialValue: _enteredFollowersQuantity.toString(),
+                    initialValue: _enteredStreamsCount.toString(),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: (value) {
@@ -125,29 +113,11 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                       return null;
                     },
                     onSaved: (value) {
-                      _enteredFollowersQuantity = int.parse(value!);
-                    },
-                  ),
-                  TextFormField(
-                    maxLength: 300,
-                    decoration: const InputDecoration(
-                      label: Text('URL da Imagem'),
-                    ),
-                    keyboardType: TextInputType.url,
-                    validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          value.trim().length > 300) {
-                        return 'Deve ter entre 1 e 300 caracteres';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _enteredImageURL = value!;
+                      _enteredStreamsCount = int.parse(value!);
                     },
                   ),
                   ElevatedButton(
-                    onPressed: () => _saveArtist(),
+                    onPressed: () => _saveSong(),
                     child: const Text('Adicionar'),
                   ),
                 ],

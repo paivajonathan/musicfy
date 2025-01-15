@@ -1,15 +1,15 @@
-class Song {
-  Song({
+class SongModel {
+  SongModel({
     required this.id,
     required this.title,
     required this.streamsCount,
-    required this.artists,
-    required this.artistsNames,
+    required this.artistId,
+    required this.artistName,
   });
 
-  int id;
+  String id;
   String title;
   int streamsCount;
-  List<int> artists;
-  List<String> artistsNames;
+  String artistId;
+  String artistName;
 }
