@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho1/helpers/constants.dart';
 import 'package:trabalho1/screens/tabs.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {

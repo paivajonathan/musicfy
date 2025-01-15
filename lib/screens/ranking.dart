@@ -21,6 +21,7 @@ class RankingScreen extends StatelessWidget {
             song: song,
             index: index,
             showArtists: true,
+            showDataManipulationActions: false,
           );
         }
       ),
