@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:trabalho1/models/artist.dart';
-import 'package:trabalho1/screens/add_artist.dart';
+import 'package:trabalho1/screens/add_edit_artist.dart';
 import 'package:trabalho1/screens/artist_details.dart';
 import 'package:trabalho1/widgets/artist_item.dart';
 import 'package:http/http.dart' as http;

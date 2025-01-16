@@ -6,25 +6,29 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:trabalho1/models/song.dart';
 
-class AddSongScreen extends StatefulWidget {
-  const AddSongScreen({
+class AddEditSongScreen extends StatefulWidget {
+  const AddEditSongScreen({
     super.key,
     required this.artistId,
     required this.artistName,
+    this.songData,
   });
 
   final String artistId;
   final String artistName;
+  final SongModel? songData;
 
   @override
-  State<AddSongScreen> createState() => _AddSongScreenState();
+  State<AddEditSongScreen> createState() => _AddSongScreenState();
 }
 
-class _AddSongScreenState extends State<AddSongScreen> {
+class _AddSongScreenState extends State<AddEditSongScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  var _enteredTitle = "";
-  var _enteredStreamsCount = 0;
+  late var _enteredTitle =
+      widget.songData != null ? widget.songData!.title : "";
+  late var _enteredStreamsCount =
+      widget.songData != null ? widget.songData!.streamsCount : 0;
 
   bool _isButtonLoading = false;
 
@@ -82,6 +86,58 @@ class _AddSongScreenState extends State<AddSongScreen> {
     }
   }
 
+  Future<void> _editSong() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    _formKey.currentState!.save();
+
+    try {
+      setState(() {
+        _isButtonLoading = true;
+      });
+
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'songs/${widget.songData!.id}.json',
+      );
+
+      await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(
+          {
+            'title': _enteredTitle,
+            'streamsCount': _enteredStreamsCount,
+            'artistId': widget.artistId,
+            'artistName': widget.artistName,
+          },
+        ),
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop(
+        SongModel(
+          id: widget.songData!.id,
+          title: _enteredTitle,
+          streamsCount: _enteredStreamsCount,
+          artistId: widget.artistId,
+          artistName: widget.artistName,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() {
+        _isButtonLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -90,7 +146,9 @@ class _AddSongScreenState extends State<AddSongScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Adicionar Música"),
+          title: widget.songData != null
+              ? const Text("Editar Música")
+              : const Text("Editar Música"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -104,6 +162,7 @@ class _AddSongScreenState extends State<AddSongScreen> {
                     decoration: const InputDecoration(
                       label: Text('Título'),
                     ),
+                    initialValue: _enteredTitle,
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
@@ -147,13 +206,19 @@ class _AddSongScreenState extends State<AddSongScreen> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                     ),
-                    onPressed: _isButtonLoading ? null : () => _saveSong(),
+                    onPressed: _isButtonLoading
+                        ? null
+                        : widget.songData != null
+                            ? () => _editSong()
+                            : () => _saveSong(),
                     child: _isButtonLoading
                         ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator())
-                        : const Text('Adicionar'),
+                        : widget.songData != null
+                            ? const Text('Editar')
+                            : const Text('Adicionar'),
                   ),
                 ],
               ),

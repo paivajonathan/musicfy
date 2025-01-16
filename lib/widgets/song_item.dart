@@ -9,12 +9,16 @@ class SongItem extends StatelessWidget {
     required this.index,
     this.showDataManipulationActions = true,
     this.showArtists = false,
+    this.onEdit,
+    this.onDelete,
   });
 
   final SongModel song;
   final int index;
   final bool showDataManipulationActions;
   final bool showArtists;
+  final void Function()? onEdit;
+  final void Function()? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +27,8 @@ class SongItem extends StatelessWidget {
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading:
-          Text((index + 1).toString(), style: const TextStyle(fontSize: 20)),
+      leading: Text((index + 1).toString(),
+          style: const TextStyle(fontSize: 20)),
       title: Text(song.title),
       subtitle: Text(
         subtitle,
@@ -52,12 +56,12 @@ class SongItem extends StatelessWidget {
                           ListTile(
                             leading: const Icon(Icons.edit),
                             title: const Text('Editar Música'),
-                            onTap: () => {},
+                            onTap: onEdit,
                           ),
                           ListTile(
                             leading: const Icon(Icons.delete),
                             title: const Text('Excluir Música'),
-                            onTap: () => {},
+                            onTap: onDelete,
                           ),
                         ],
                       )

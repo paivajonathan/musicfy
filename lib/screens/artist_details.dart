@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho1/models/artist.dart';
 import 'package:trabalho1/models/song.dart';
-import 'package:trabalho1/screens/add_artist.dart';
-import 'package:trabalho1/screens/add_song.dart';
+import 'package:trabalho1/screens/add_edit_artist.dart';
+import 'package:trabalho1/screens/add_edit_song.dart';
 import 'package:trabalho1/widgets/song_item.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -86,6 +86,51 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
         _isLoadingSongs = false;
       });
     }
+  }
+
+  Future<void> _addSong() async {
+    final newSong = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return AddEditSongScreen(
+            artistId: _artistData.id,
+            artistName: _artistData.name,
+          );
+        },
+      ),
+    );
+
+    if (newSong == null) {
+      return;
+    }
+
+    setState(() {
+      _wasEdited = true;
+      _songs.add(newSong);
+    });
+  }
+
+  Future<void> _editArtist() async {
+    Navigator.of(context).pop();
+
+    final editedArtist = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return AddEditArtistScreen(
+            artistData: _artistData,
+          );
+        },
+      ),
+    );
+
+    if (editedArtist == null) {
+      return;
+    }
+
+    setState(() {
+      _artistData = editedArtist;
+      _wasEdited = true;
+    });
   }
 
   Future<void> _deleteArtist() async {
@@ -191,34 +236,13 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                               ListTile(
                                 leading: const Icon(Icons.edit),
                                 title: const Text('Editar Artista'),
-                                onTap: () async {
-                                  Navigator.of(context).pop();
-
-                                  final editedArtist =
-                                      await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return AddEditArtistScreen(
-                                          artistData: _artistData,
-                                        );
-                                      },
-                                    ),
-                                  );
-
-                                  if (editedArtist == null) {
-                                    return;
-                                  }
-
-                                  setState(() {
-                                    _artistData = editedArtist;
-                                    _wasEdited = true;
-                                  });
-                                },
+                                onTap: () => _editArtist(),
                               ),
                               ListTile(
-                                  leading: const Icon(Icons.delete),
-                                  title: const Text('Excluir Artista'),
-                                  onTap: () => _deleteArtist()),
+                                leading: const Icon(Icons.delete),
+                                title: const Text('Excluir Artista'),
+                                onTap: () => _deleteArtist(),
+                              ),
                             ],
                           )
                         ],
@@ -246,27 +270,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                           style: Theme.of(context).textTheme.titleLarge!,
                         ),
                         IconButton(
-                          onPressed: () async {
-                            final newSong = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return AddSongScreen(
-                                    artistId: _artistData.id,
-                                    artistName: _artistData.name,
-                                  );
-                                },
-                              ),
-                            );
-
-                            if (newSong == null) {
-                              return;
-                            }
-
-                            setState(() {
-                              _wasEdited = true;
-                              _songs.add(newSong);
-                            });
-                          },
+                          onPressed: () => _addSong(),
                           icon: const Icon(Icons.add),
                         )
                       ],
