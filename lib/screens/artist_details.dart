@@ -225,6 +225,19 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   Future<void> _deleteArtist() async {
     Navigator.of(context).pop();
 
+    if (_songs.isNotEmpty) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Não é possível excluir o artista, pois possui músicas relacionadas.",
+            ),
+          ),
+        );
+      return;
+    }
+
     final result = await showDialog(
       context: context,
       barrierDismissible: false,
