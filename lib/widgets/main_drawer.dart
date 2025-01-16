@@ -30,8 +30,8 @@ class MainDrawer extends ConsumerWidget {
             ),
             child: Center(
               child: (userData != null)
-                  ? Text(userData.name)
-                  : const Text("Usuário Não Identificado"),
+                  ? Text(userData.name, style: Theme.of(context).textTheme.titleLarge!)
+                  : Text("Usuário Não Identificado", style: Theme.of(context).textTheme.titleLarge!),
             ),
           ),
           ListTile(

@@ -22,6 +22,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   var _enteredPassword = "";
 
   bool _isButtonLoading = false;
+  bool _isGoogleButtonLoading = false;
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) {
@@ -101,12 +102,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _googleLogin() async {
     try {
+      setState(() {
+        _isGoogleButtonLoading = true;
+      });
+
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
+
+      if (googleUser == null) {
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
       final userCredential =
@@ -141,6 +151,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         );
+    } finally {
+      setState(() {
+        _isGoogleButtonLoading = false;
+      });
     }
   }
 
@@ -198,17 +212,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _enteredPassword = value!;
                     },
                   ),
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    child: const Text("Ainda não possui conta?"),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterScreen(),
-                        ),
-                      );
-                    },
-                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -241,13 +244,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                     ),
-                    onPressed: _isButtonLoading ? null : () => _googleLogin(),
-                    child: _isButtonLoading
+                    onPressed:
+                        _isGoogleButtonLoading ? null : () => _googleLogin(),
+                    child: _isGoogleButtonLoading
                         ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator())
                         : const Text("Login com Google"),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    child: const Text("Ainda não possui conta?"),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
