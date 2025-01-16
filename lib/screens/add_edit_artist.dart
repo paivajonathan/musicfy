@@ -112,6 +112,26 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
     _formKey.currentState!.save();
 
+    final isImageUrlValid = await validateImage(_enteredImageUrl);
+
+    if (!isImageUrlValid) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "URL não é uma imagem válida. Tente novamente.",
+            ),
+          ),
+        );
+
+      return;
+    }
+
     try {
       setState(() {
         _isButtonLoading = true;

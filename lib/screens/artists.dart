@@ -165,6 +165,7 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
                                 .where((item) => item.id != artist.id)
                                 .toList();
                           });
+                          return;
                         }
 
                         final oldArtistIndex = _artists.indexWhere(

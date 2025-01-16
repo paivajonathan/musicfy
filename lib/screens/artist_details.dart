@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trabalho1/models/artist.dart';
 import 'package:trabalho1/models/song.dart';
+import 'package:trabalho1/providers/favorite_songs.dart';
 import 'package:trabalho1/screens/add_edit_artist.dart';
 import 'package:trabalho1/screens/add_edit_song.dart';
 import 'package:trabalho1/widgets/song_item.dart';
@@ -8,7 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:trabalho1/widgets/title_image.dart';
 
-class ArtistDetailsScreen extends StatefulWidget {
+class ArtistDetailsScreen extends ConsumerStatefulWidget {
   const ArtistDetailsScreen({
     super.key,
     required this.artist,
@@ -17,10 +19,10 @@ class ArtistDetailsScreen extends StatefulWidget {
   final ArtistModel artist;
 
   @override
-  State<ArtistDetailsScreen> createState() => _ArtistDetailsScreenState();
+  ConsumerState<ArtistDetailsScreen> createState() => _ArtistDetailsScreenState();
 }
 
-class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
+class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
   List<SongModel> _songs = [];
   bool _isLoadingSongs = true;
   String? _isLoadingSongsError;
@@ -140,6 +142,8 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     setState(() {
       _songs[oldSongIndex] = editedSong;
     });
+
+    ref.read(favoriteSongsProvider.notifier).updateSong(editedSong);
   }
 
   Future<void> _deleteSong(SongModel songData) async {
@@ -204,6 +208,8 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
             content: Text("Música excluída com sucesso."),
           ),
         );
+
+      ref.read(favoriteSongsProvider.notifier).removeSong(songData);
     } catch (e) {
       if (!mounted) {
         return;
@@ -236,6 +242,8 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       _artistData = editedArtist;
       _wasEdited = true;
     });
+
+    ref.read(favoriteSongsProvider.notifier).updateArtistName(editedArtist.id, editedArtist.name);
   }
 
   Future<void> _deleteArtist() async {
