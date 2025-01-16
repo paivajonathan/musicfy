@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:trabalho1/widgets/title_image.dart';
 
 class ArtistDetailsScreen extends StatefulWidget {
-  ArtistDetailsScreen({
+  const ArtistDetailsScreen({
     super.key,
     required this.artist,
   });
@@ -88,6 +88,69 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     }
   }
 
+  Future<void> _deleteArtist() async {
+    Navigator.of(context).pop();
+
+    final result = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmação'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Tem certeza de que'),
+                Text('deseja excluir esse artista?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Excluir'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == null && !result) {
+      return;
+    }
+
+    try {
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'artists/${_artistData.id}.json',
+      );
+
+      await http.delete(url);
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -153,10 +216,9 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                                 },
                               ),
                               ListTile(
-                                leading: const Icon(Icons.delete),
-                                title: const Text('Excluir Artista'),
-                                onTap: () => {},
-                              ),
+                                  leading: const Icon(Icons.delete),
+                                  title: const Text('Excluir Artista'),
+                                  onTap: () => _deleteArtist()),
                             ],
                           )
                         ],

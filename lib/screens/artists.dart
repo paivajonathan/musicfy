@@ -156,7 +156,11 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
 
                         if (editedRemovedArtist is bool &&
                             editedRemovedArtist) {
-                          print("Removido");
+                          setState(() {
+                            _artists = _artists
+                                .where((item) => item.id != artist.id)
+                                .toList();
+                          });
                         }
 
                         final oldArtistIndex = _artists.indexWhere(
