@@ -24,8 +24,8 @@ class TabsBottomNavigation extends StatelessWidget {
           label: "Artistas",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.leaderboard),
-          label: "Ranking",
+          icon: Icon(Icons.favorite),
+          label: "Favoritos",
         ),
       ],
     );
