@@ -48,7 +48,7 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
           ArtistModel(
             id: item.key,
             name: item.value["name"],
-            imageUrl: item.value["imageURL"],
+            imageUrl: item.value["imageUrl"],
             followers: item.value["followersQuantity"],
             description: item.value["description"],
           ),

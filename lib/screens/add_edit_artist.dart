@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:trabalho1/helpers/validators.dart';
 import 'package:trabalho1/models/artist.dart';
 
 class AddEditArtistScreen extends StatefulWidget {
@@ -24,7 +25,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
       widget.artistData != null ? widget.artistData!.description : "";
   late var _enteredFollowersQuantity =
       widget.artistData != null ? widget.artistData!.followers : 0;
-  late var _enteredImageURL =
+  late var _enteredImageUrl =
       widget.artistData != null ? widget.artistData!.imageUrl : "";
 
   bool _isButtonLoading = false;
@@ -33,6 +34,26 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
+
+    final isImageUrlValid = await validateImage(_enteredImageUrl);
+
+    if (!isImageUrlValid) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "URL não é uma imagem válida. Tente novamente.",
+            ),
+          ),
+        );
+
+      return;
+    }
 
     try {
       setState(() {
@@ -54,7 +75,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
             'name': _enteredName,
             'description': _enteredDescription,
             'followersQuantity': _enteredFollowersQuantity,
-            'imageURL': _enteredImageURL,
+            'imageUrl': _enteredImageUrl,
           },
         ),
       );
@@ -65,12 +86,13 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(const SnackBar(content: Text("Artista adicionado com sucesso.")));
+        ..showSnackBar(
+            const SnackBar(content: Text("Artista adicionado com sucesso.")));
 
       Navigator.of(context).pop(ArtistModel(
         id: data["name"],
         name: _enteredName,
-        imageUrl: _enteredImageURL,
+        imageUrl: _enteredImageUrl,
         followers: _enteredFollowersQuantity,
         description: _enteredDescription,
       ));
@@ -110,7 +132,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
             'name': _enteredName,
             'description': _enteredDescription,
             'followersQuantity': _enteredFollowersQuantity,
-            'imageURL': _enteredImageURL,
+            'imageUrl': _enteredImageUrl,
           },
         ),
       );
@@ -119,12 +141,18 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(const SnackBar(content: Text("Informações do artista editadas com sucesso.")));
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Informações do artista editadas com sucesso.",
+            ),
+          ),
+        );
 
       Navigator.of(context).pop(ArtistModel(
         id: widget.artistData!.id,
         name: _enteredName,
-        imageUrl: _enteredImageURL,
+        imageUrl: _enteredImageUrl,
         followers: _enteredFollowersQuantity,
         description: _enteredDescription,
       ));
@@ -220,7 +248,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                     decoration: const InputDecoration(
                       label: Text('URL da Imagem'),
                     ),
-                    initialValue: _enteredImageURL,
+                    initialValue: _enteredImageUrl,
                     keyboardType: TextInputType.url,
                     validator: (value) {
                       if (value == null ||
@@ -228,10 +256,19 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                           value.trim().length > 300) {
                         return 'Deve ter entre 1 e 300 caracteres';
                       }
+
+                      // final imageRegex = RegExp(
+                      //   r'^(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)$',
+                      // );
+
+                      // if (!imageRegex.hasMatch(value)) {
+                      //   return "URL Inválida";
+                      // }
+
                       return null;
                     },
                     onSaved: (value) {
-                      _enteredImageURL = value!;
+                      _enteredImageUrl = value!;
                     },
                   ),
                   const SizedBox(height: 20),
