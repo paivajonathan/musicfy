@@ -98,6 +98,39 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext bc) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Wrap(
+                        children: <Widget>[
+                          Column(
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.edit),
+                                title: const Text('Editar Artista'),
+                                onTap: () => {},
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.delete),
+                                title: const Text('Excluir Artista'),
+                                onTap: () => {},
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -133,7 +166,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                               if (newSong == null) {
                                 return;
                               }
-      
+
                               setState(() {
                                 _songs.add(newSong);
                               });
@@ -147,13 +180,14 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                     Builder(
                       builder: (context) {
                         if (_isLoadingSongs) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
-      
+
                         if (_isLoadingSongsError != null) {
                           return Center(child: Text(_isLoadingSongsError!));
                         }
-      
+
                         if (_songs.isEmpty) {
                           return const Center(
                             child: Text(
@@ -161,11 +195,11 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                             ),
                           );
                         }
-      
+
                         _songs.sort(
                           (a, b) => b.streamsCount.compareTo(a.streamsCount),
                         );
-      
+
                         return Column(
                           children: [
                             for (final (index, song) in _songs.indexed)

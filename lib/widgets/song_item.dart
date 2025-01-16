@@ -51,12 +51,12 @@ class SongItem extends StatelessWidget {
                         children: [
                           ListTile(
                             leading: const Icon(Icons.edit),
-                            title: const Text('Editar'),
+                            title: const Text('Editar Música'),
                             onTap: () => {},
                           ),
                           ListTile(
                             leading: const Icon(Icons.delete),
-                            title: const Text('Excluir'),
+                            title: const Text('Excluir Música'),
                             onTap: () => {},
                           ),
                         ],
