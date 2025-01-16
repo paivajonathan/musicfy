@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:trabalho1/models/artist.dart';
 
 class AddArtistScreen extends StatefulWidget {
   const AddArtistScreen({super.key});
@@ -52,9 +53,17 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
         ),
       );
 
+      final data = json.decode(response.body);
+
       if (!mounted) return;
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(ArtistModel(
+        id: data["name"],
+        name: _enteredName,
+        imageUrl: _enteredImageURL,
+        followers: _enteredFollowersQuantity,
+        description: _enteredDescription,
+      ));
     } catch (e) {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
@@ -166,7 +175,10 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                     ),
                     onPressed: _isButtonLoading ? null : () => _saveArtist(),
                     child: _isButtonLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator())
                         : const Text('Adicionar'),
                   ),
                 ],

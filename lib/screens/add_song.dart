@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:trabalho1/models/song.dart';
 
 class AddSongScreen extends StatefulWidget {
   const AddSongScreen({
@@ -57,9 +58,19 @@ class _AddSongScreenState extends State<AddSongScreen> {
         ),
       );
 
+      final data = json.decode(response.body);
+
       if (!mounted) return;
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(
+        SongModel(
+          id: data["name"],
+          title: _enteredTitle,
+          streamsCount: _enteredStreamsCount,
+          artistId: widget.artistId,
+          artistName: widget.artistName,
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
@@ -126,7 +137,9 @@ class _AddSongScreenState extends State<AddSongScreen> {
                       _enteredStreamsCount = int.parse(value!);
                     },
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       fixedSize: Size(MediaQuery.of(context).size.width, 50),
@@ -136,7 +149,10 @@ class _AddSongScreenState extends State<AddSongScreen> {
                     ),
                     onPressed: _isButtonLoading ? null : () => _saveSong(),
                     child: _isButtonLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator())
                         : const Text('Adicionar'),
                   ),
                 ],

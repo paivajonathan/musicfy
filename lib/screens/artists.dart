@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:trabalho1/models/artist.dart';
+import 'package:trabalho1/screens/add_artist.dart';
 import 'package:trabalho1/widgets/artist_item.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,7 +37,7 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
       }
 
       final List<ArtistModel> loadedItems = [];
-      
+
       for (final item in data.entries) {
         loadedItems.add(
           ArtistModel(
@@ -81,34 +82,67 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Builder(
-        builder: (context) {
-          if (_isLoadingArtists) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (_isLoadingArtistsError != null) {
-            return Center(child: Text(_isLoadingArtistsError!));
-          }
-
-          if (_artists.isEmpty) {
-            return const Center(child: Text("Não há artistas cadastrados"));
-          }
-
-          final sortedArtists = _artists;
-          sortedArtists.sort((a, b) => a.name.compareTo(b.name));
-
-          return ListView.separated(
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
-            itemCount: sortedArtists.length,
-            itemBuilder: (context, index) {
-              final artist = sortedArtists[index];
-              return ArtistItem(artist: artist);
-            },
-          );
-        }
+    return RefreshIndicator(
+      onRefresh: _loadArtists,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Artistas", style: Theme.of(context).textTheme.titleLarge),
+                IconButton(
+                  onPressed: () async {
+                    final newArtist = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) => const AddArtistScreen(),
+                      ),
+                    );
+      
+                    if (newArtist == null) {
+                      return;
+                    }
+      
+                    setState(() {
+                      _artists.add(newArtist);
+                    });
+                  },
+                  icon: const Icon(Icons.add),
+                )
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Builder(builder: (context) {
+                if (_isLoadingArtists) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+      
+                if (_isLoadingArtistsError != null) {
+                  return Center(child: Text(_isLoadingArtistsError!));
+                }
+      
+                if (_artists.isEmpty) {
+                  return const Center(child: Text("Não há artistas cadastrados"));
+                }
+      
+                final sortedArtists = _artists;
+                sortedArtists.sort((a, b) => a.name.compareTo(b.name));
+      
+                return ListView.separated(
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
+                  itemCount: sortedArtists.length,
+                  itemBuilder: (context, index) {
+                    final artist = sortedArtists[index];
+                    return ArtistItem(artist: artist);
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }

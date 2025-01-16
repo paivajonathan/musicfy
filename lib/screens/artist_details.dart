@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trabalho1/data/songs.dart';
 import 'package:trabalho1/models/artist.dart';
 import 'package:trabalho1/models/song.dart';
 import 'package:trabalho1/screens/add_song.dart';
@@ -7,8 +6,6 @@ import 'package:trabalho1/widgets/song_item.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:trabalho1/widgets/title_image.dart';
-
-// const int _kMaxSongsCount = 5;
 
 class ArtistDetailsScreen extends StatefulWidget {
   const ArtistDetailsScreen({
@@ -95,93 +92,104 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TitleImage(artist: widget.artist, isHeader: true),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const IconButton(
-                        onPressed: null,
-                        icon: Icon(Icons.settings, color: Colors.transparent),
-                      ),
-                      Text(
-                        "Músicas",
-                        style: Theme.of(context).textTheme.titleLarge!,
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return AddSongScreen(
-                                  artistId: widget.artist.id,
-                                  artistName: widget.artist.name,
-                                );
-                              },
+    return RefreshIndicator(
+      onRefresh: _loadSongs,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              TitleImage(artist: widget.artist, isHeader: true),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const IconButton(
+                          onPressed: null,
+                          icon: Icon(Icons.settings, color: Colors.transparent),
+                        ),
+                        Text(
+                          "Músicas",
+                          style: Theme.of(context).textTheme.titleLarge!,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return AddSongScreen(
+                                    artistId: widget.artist.id,
+                                    artistName: widget.artist.name,
+                                  );
+                                },
+                              ),
+                            ).then((newSong) {
+                              if (newSong == null) {
+                                return;
+                              }
+      
+                              setState(() {
+                                _songs.add(newSong);
+                              });
+                            });
+                          },
+                          icon: const Icon(Icons.add),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Builder(
+                      builder: (context) {
+                        if (_isLoadingSongs) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+      
+                        if (_isLoadingSongsError != null) {
+                          return Center(child: Text(_isLoadingSongsError!));
+                        }
+      
+                        if (_songs.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              "Não há músicas cadastradas para esse artista.",
                             ),
                           );
-                        },
-                        icon: const Icon(Icons.add),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Builder(
-                    builder: (context) {
-                      if (_isLoadingSongs) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (_isLoadingSongsError != null) {
-                        return Center(child: Text(_isLoadingSongsError!));
-                      }
-
-                      if (_songs.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "Não há músicas cadastradas para esse artista.",
-                          ),
+                        }
+      
+                        _songs.sort(
+                          (a, b) => b.streamsCount.compareTo(a.streamsCount),
                         );
-                      }
-
-                      _songs.sort(
-                        (a, b) => b.streamsCount.compareTo(a.streamsCount),
-                      );
-
-                      return Column(
-                        children: [
-                          for (final (index, song) in _songs.indexed)
-                            SongItem(song: song, index: index)
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Sobre",
-                    style: Theme.of(context).textTheme.titleLarge!,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    widget.artist.description,
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.bodyLarge!,
-                  ),
-                ],
+      
+                        return Column(
+                          children: [
+                            for (final (index, song) in _songs.indexed)
+                              SongItem(song: song, index: index)
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "Sobre",
+                      style: Theme.of(context).textTheme.titleLarge!,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      widget.artist.description,
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.bodyLarge!,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
