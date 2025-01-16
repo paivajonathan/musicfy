@@ -66,6 +66,10 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(content: Text("Música adicionada com sucesso.")));
+
       Navigator.of(context).pop(
         SongModel(
           id: data["name"],
@@ -117,6 +121,10 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
       );
 
       if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(content: Text("Informações da música editadas com sucesso.")));
 
       Navigator.of(context).pop(
         SongModel(

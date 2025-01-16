@@ -63,6 +63,10 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
       if (!mounted) return;
 
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(content: Text("Artista adicionado com sucesso.")));
+
       Navigator.of(context).pop(ArtistModel(
         id: data["name"],
         name: _enteredName,
@@ -112,6 +116,10 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
       );
 
       if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(content: Text("Informações do artista editadas com sucesso.")));
 
       Navigator.of(context).pop(ArtistModel(
         id: widget.artistData!.id,
