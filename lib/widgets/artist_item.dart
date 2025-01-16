@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho1/models/artist.dart';
-import 'package:trabalho1/screens/artist_details.dart';
 import 'package:trabalho1/widgets/title_image.dart';
 
 class ArtistItem extends StatelessWidget {

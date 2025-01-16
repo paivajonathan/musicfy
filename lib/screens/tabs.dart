@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:trabalho1/providers/user_data.dart';
 import 'package:trabalho1/screens/about.dart';
 import 'package:trabalho1/screens/artists.dart';
 import 'package:trabalho1/screens/favorite_songs.dart';

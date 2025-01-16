@@ -80,6 +80,13 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
   }
 
   @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     _loadArtists();

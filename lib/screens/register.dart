@@ -1,10 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:trabalho1/models/user.dart';
-import 'package:trabalho1/providers/user_data.dart';
-import 'package:trabalho1/screens/tabs.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
