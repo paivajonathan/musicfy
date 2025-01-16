@@ -110,6 +110,95 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
     });
   }
 
+  Future<void> _editSong(SongModel songData) async {
+    Navigator.of(context).pop();
+
+    final editedSong = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return AddEditSongScreen(
+            artistId: _artistData.id,
+            artistName: _artistData.name,
+            songData: songData,
+          );
+        },
+      ),
+    );
+
+    if (editedSong == null) {
+      return;
+    }
+
+    final oldSongIndex = _songs.indexWhere(
+      (item) => item.id == editedSong.id,
+    );
+
+    setState(() {
+      _songs[oldSongIndex] = editedSong;
+    });
+  }
+
+  Future<void> _deleteSong(SongModel songData) async {
+    Navigator.of(context).pop();
+
+    final result = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmação'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Tem certeza de que'),
+                Text('deseja excluir essa música?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Excluir'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == null || !result) {
+      return;
+    }
+
+    try {
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'songs/${songData.id}.json',
+      );
+
+      await http.delete(url);
+
+      setState(() {
+        _songs = _songs.where((item) => item.id != songData.id).toList();
+      });
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
   Future<void> _editArtist() async {
     Navigator.of(context).pop();
 
@@ -168,7 +257,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       },
     );
 
-    if (result == null && !result) {
+    if (result == null || !result) {
       return;
     }
 
@@ -200,6 +289,44 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   void initState() {
     super.initState();
     _loadSongs();
+  }
+
+  Widget _renderSongs() {
+    if (_isLoadingSongs) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (_isLoadingSongsError != null) {
+      return Center(
+        child: Text(_isLoadingSongsError!),
+      );
+    }
+
+    if (_songs.isEmpty) {
+      return const Center(
+        child: Text(
+          "Não há músicas cadastradas para esse artista.",
+        ),
+      );
+    }
+
+    _songs.sort(
+      (a, b) => b.streamsCount.compareTo(a.streamsCount),
+    );
+
+    return Column(
+      children: [
+        for (final (index, song) in _songs.indexed)
+          SongItem(
+            song: song,
+            index: index,
+            onEdit: () => _editSong(song),
+            onDelete: () => _deleteSong(song),
+          )
+      ],
+    );
   }
 
   @override
@@ -276,37 +403,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Builder(
-                      builder: (context) {
-                        if (_isLoadingSongs) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
-
-                        if (_isLoadingSongsError != null) {
-                          return Center(child: Text(_isLoadingSongsError!));
-                        }
-
-                        if (_songs.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "Não há músicas cadastradas para esse artista.",
-                            ),
-                          );
-                        }
-
-                        _songs.sort(
-                          (a, b) => b.streamsCount.compareTo(a.streamsCount),
-                        );
-
-                        return Column(
-                          children: [
-                            for (final (index, song) in _songs.indexed)
-                              SongItem(song: song, index: index)
-                          ],
-                        );
-                      },
-                    ),
+                    _renderSongs(),
                     const SizedBox(height: 20),
                     Text(
                       "Sobre",
