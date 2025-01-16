@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:trabalho1/models/user.dart';
 import 'package:trabalho1/providers/user_data.dart';
 import 'package:trabalho1/screens/register.dart';
@@ -98,6 +99,51 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _googleLogin() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      ref.read(userDataProvider.notifier).addUserData(
+            UserModel(
+              id: userCredential.user!.uid,
+              email: userCredential.user!.email!,
+              name: userCredential.user!.displayName!,
+            ),
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return const TabsScreen();
+          },
+        ),
+      );
+    } on Exception catch (e) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -180,6 +226,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             height: 20,
                             child: CircularProgressIndicator())
                         : const Text("Login"),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text("ou"),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(MediaQuery.of(context).size.width, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    onPressed: _isButtonLoading ? null : () => _googleLogin(),
+                    child: _isButtonLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator())
+                        : const Text("Login com Google"),
                   ),
                 ],
               ),

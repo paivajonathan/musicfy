@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:trabalho1/models/user.dart';
 import 'package:trabalho1/providers/user_data.dart';
 import 'package:trabalho1/screens/login.dart';
@@ -27,7 +28,11 @@ class MainDrawer extends ConsumerWidget {
               borderRadius:
                   const BorderRadius.only(bottomRight: Radius.circular(20)),
             ),
-            child: Center(child: Text(userData!.name)),
+            child: Center(
+              child: (userData != null)
+                  ? Text(userData.name)
+                  : const Text("Usuário Não Identificado"),
+            ),
           ),
           ListTile(
             leading: const Icon(
@@ -65,12 +70,13 @@ class MainDrawer extends ConsumerWidget {
             ),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
+              await GoogleSignIn().signOut();
+
+              ref.read(userDataProvider.notifier).removeUserData();
 
               if (!context.mounted) {
                 return;
               }
-
-              Navigator.of(context).pop();
 
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
