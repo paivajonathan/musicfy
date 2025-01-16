@@ -1,0 +1,25 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:trabalho1/models/song.dart';
+
+class FavoriteSongsNotifier extends StateNotifier<List<SongModel>> {
+  FavoriteSongsNotifier() : super([]);
+
+  void toggleSongFavoriteStatus(SongModel song) {
+    final mealIsFavorite = state.contains(song);
+
+    if (mealIsFavorite) {
+      state = state.where((s) => s.id != song.id).toList();
+    } else {
+      state = [...state, song];
+    }
+  }
+
+  bool isFavorite(SongModel song) {
+    return state.contains(song);
+  }
+}
+
+final favoriteSongsProvider =
+    StateNotifierProvider<FavoriteSongsNotifier, List<SongModel>>((ref) {
+  return FavoriteSongsNotifier();
+});

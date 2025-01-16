@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho1/screens/about.dart';
 import 'package:trabalho1/screens/artists.dart';
-import 'package:trabalho1/screens/ranking.dart';
+import 'package:trabalho1/screens/favorite_songs.dart';
 import 'package:trabalho1/widgets/main_drawer.dart';
 import 'package:trabalho1/widgets/tabs_bottom_navigation.dart';
 
@@ -16,7 +16,7 @@ class _TabsScreenState extends State<TabsScreen> {
   int _activeNavigationScreenIndex = 0;
   final List<Widget> _navigationScreens = [
     const ArtistsScreen(),
-    const RankingScreen(),
+    const FavoriteSongsScreen(),
   ];
 
   void _selectDrawerScreen(BuildContext context, String identifier) {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trabalho1/helpers/formatters.dart';
 import 'package:trabalho1/models/song.dart';
+import 'package:trabalho1/providers/favorite_songs.dart';
 
-class SongItem extends StatelessWidget {
+class SongItem extends ConsumerWidget {
   const SongItem({
     super.key,
     required this.song,
@@ -21,14 +23,14 @@ class SongItem extends StatelessWidget {
   final void Function()? onDelete;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final subtitle = formatNumber(song.streamsCount) +
         (showArtists ? " | ${song.artistName}" : "");
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Text((index + 1).toString(),
-          style: const TextStyle(fontSize: 20)),
+      leading:
+          Text((index + 1).toString(), style: const TextStyle(fontSize: 20)),
       title: Text(song.title),
       subtitle: Text(
         subtitle,
@@ -47,8 +49,28 @@ class SongItem extends StatelessWidget {
                   children: <Widget>[
                     ListTile(
                       leading: const Icon(Icons.favorite),
-                      title: const Text('Adicionar aos Favoritos'),
-                      onTap: () => {},
+                      title: ref
+                              .read(favoriteSongsProvider.notifier)
+                              .isFavorite(song)
+                          ? const Text('Remover dos Favoritos')
+                          : const Text("Adicionar aos favoritos"),
+                      onTap: () {
+                        ref
+                            .read(favoriteSongsProvider.notifier)
+                            .toggleSongFavoriteStatus(song);
+
+                        Navigator.of(context).pop();
+
+                        String message = ref
+                                .read(favoriteSongsProvider.notifier)
+                                .isFavorite(song)
+                            ? "Música adicionada aos Favoritos."
+                            : "Música removida dos Favoritos";
+
+                        ScaffoldMessenger.of(context)
+                          ..clearSnackBars()
+                          ..showSnackBar(SnackBar(content: Text(message)));
+                      },
                     ),
                     if (showDataManipulationActions)
                       Column(
