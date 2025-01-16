@@ -4,25 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trabalho1/models/user.dart';
 import 'package:trabalho1/providers/user_data.dart';
-import 'package:trabalho1/screens/register.dart';
 import 'package:trabalho1/screens/tabs.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  var _enteredName = "";
   var _enteredEmail = "";
   var _enteredPassword = "";
 
   bool _isButtonLoading = false;
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -35,45 +35,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       });
 
       final userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _enteredEmail,
         password: _enteredPassword,
       );
-
-      ref.read(userDataProvider.notifier).addUserData(
-            UserModel(
-              id: userCredential.user!.uid,
-              email: userCredential.user!.email!,
-              name: userCredential.user!.displayName ?? "Sem nome",
-            ),
-          );
 
       if (!mounted) {
         return;
       }
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) {
-            return const TabsScreen();
-          },
-        ),
-      );
+      if (userCredential.user == null) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text("Ocorreu um erro inesperado, tente novamente."),
+            ),
+          );
+      }
+
+      await userCredential.user!.updateDisplayName(_enteredName);
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Conta cadastrada com sucesso.",
+            ),
+          ),
+        );
+
+      Navigator.of(context).pop();
     } on FirebaseException catch (e) {
       String message;
+
       switch (e.code) {
-        case 'user-not-found':
-          message = 'Não foi encontrado um usuário com esse email.';
+        case 'weak-password':
+          message = 'A senha digitada é muito fraca.';
           break;
-        case 'wrong-password':
-          message = 'Senha incorreta.';
-          break;
-        case 'network-request-failed':
-          message = 'Por favor verifique a sua conexão com a internet.';
+        case 'email-already-in-use':
+          message = 'Já existe uma conta com esse email';
           break;
         default:
           message = 'Um erro inesperado ocorreu. Por favor, tente novamente.';
       }
+
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
@@ -106,7 +117,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Login"),
+          title: const Text("Cadastrar-se"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -115,6 +126,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  TextFormField(
+                    maxLength: 50,
+                    decoration: const InputDecoration(
+                      label: Text('Nome'),
+                    ),
+                    initialValue: _enteredName,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length > 50) {
+                        return 'Deve ter entre 1 e 50 caracteres';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _enteredName = value!;
+                    },
+                  ),
                   TextFormField(
                     maxLength: 50,
                     decoration: const InputDecoration(
@@ -152,17 +181,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _enteredPassword = value!;
                     },
                   ),
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    child: const Text("Ainda não possui conta?"),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterScreen(),
-                        ),
-                      );
-                    },
-                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -173,13 +191,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                     ),
-                    onPressed: _isButtonLoading ? null : () => _login(),
+                    onPressed: _isButtonLoading ? null : () => _register(),
                     child: _isButtonLoading
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator())
-                        : const Text("Login"),
+                            child: CircularProgressIndicator(),
+                          )
+                        : const Text("Cadastrar-se"),
                   ),
                 ],
               ),
