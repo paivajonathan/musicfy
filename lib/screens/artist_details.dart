@@ -188,6 +188,18 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       setState(() {
         _songs = _songs.where((item) => item.id != songData.id).toList();
       });
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Música excluída com sucesso."),
+          ),
+        );
     } catch (e) {
       if (!mounted) {
         return;
@@ -285,6 +297,11 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       if (!mounted) {
         return;
       }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+            const SnackBar(content: Text("Artista excluído com sucesso.")));
 
       Navigator.of(context).pop(true);
     } catch (e) {
