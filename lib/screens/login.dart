@@ -176,7 +176,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 children: [
                   TextFormField(
-                    maxLength: 50,
+                    maxLength: 100,
                     decoration: const InputDecoration(
                       label: Text('Email'),
                     ),
@@ -184,8 +184,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
-                          value.trim().length > 50) {
-                        return 'Deve ter entre 1 e 50 caracteres';
+                          value.trim().length > 100) {
+                        return 'Deve ter entre 1 e 100 caracteres';
                       }
                       return null;
                     },

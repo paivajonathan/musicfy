@@ -35,9 +35,9 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
     _formKey.currentState!.save();
 
-    final isImageUrlValid = await validateImage(_enteredImageUrl);
+    final isImageValid = await isImageUrlValid(_enteredImageUrl);
 
-    if (!isImageUrlValid) {
+    if (!isImageValid) {
       if (!mounted) {
         return;
       }
@@ -112,9 +112,9 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
     _formKey.currentState!.save();
 
-    final isImageUrlValid = await validateImage(_enteredImageUrl);
+    final isImageValid = await isImageUrlValid(_enteredImageUrl);
 
-    if (!isImageUrlValid) {
+    if (!isImageValid) {
       if (!mounted) {
         return;
       }

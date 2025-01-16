@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:trabalho1/helpers/validators.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -140,7 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   TextFormField(
-                    maxLength: 50,
+                    maxLength: 100,
                     decoration: const InputDecoration(
                       label: Text('Email'),
                     ),
@@ -148,9 +149,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
-                          value.trim().length > 50) {
-                        return 'Deve ter entre 1 e 50 caracteres';
+                          value.trim().length > 100) {
+                        return 'Deve ter entre 1 e 100 caracteres';
                       }
+
+                      if (!isEmailValid(value)) {
+                        return 'Email inválido';
+                      }
+
                       return null;
                     },
                     onSaved: (value) {

@@ -25,7 +25,7 @@ class FavoriteSongsScreen extends ConsumerWidget {
           return SongItem(
             song: song,
             index: index,
-            showArtists: true,
+            showArtist: true,
             showDataManipulationActions: false,
           );
         },

@@ -19,6 +19,19 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
   bool _isLoadingArtists = true;
   String? _isLoadingArtistsError;
 
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadArtists();
+  }
+
   Future<void> _loadArtists() async {
     try {
       setState(() {
@@ -31,6 +44,16 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
       );
 
       final response = await http.get(url);
+
+      if (response.statusCode > 400) {
+        setState(() {
+          _artists = [];
+          _isLoadingArtistsError =
+              "Ocorreu um erro inesperado ao tentar carregar os artistas.";
+        });
+        return;
+      }
+
       final data = json.decode(response.body);
 
       if (data == null) {
@@ -64,13 +87,9 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
         return;
       }
 
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
-
       setState(() {
         _artists = [];
-        _isLoadingArtistsError = e.toString();
+        _isLoadingArtistsError = e.toString().replaceAll("Exception: ", "");
       });
     } finally {
       setState(() {
@@ -79,17 +98,78 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
     }
   }
 
-  @override
-  void setState(fn) {
-    if(mounted) {
-      super.setState(fn);
+  Future<void> _handleArtistAdd() async {
+    final newArtist = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const AddEditArtistScreen(),
+      ),
+    );
+
+    if (newArtist == null) {
+      return;
     }
+
+    setState(() {
+      _artists.add(newArtist);
+    });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadArtists();
+  Future<void> _handleArtistEditDelete(ArtistModel artist) async {
+    final editedRemovedArtist = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ArtistDetailsScreen(
+          artist: artist,
+        ),
+      ),
+    );
+
+    if (editedRemovedArtist == null) {
+      return;
+    }
+
+    if (editedRemovedArtist is bool && editedRemovedArtist) {
+      setState(() {
+        _artists = _artists.where((item) => item.id != artist.id).toList();
+      });
+      return;
+    }
+
+    final oldArtistIndex = _artists.indexWhere(
+      (item) => item.id == editedRemovedArtist.id,
+    );
+
+    setState(() {
+      _artists[oldArtistIndex] = editedRemovedArtist;
+    });
+  }
+
+  Widget _renderArtists() {
+    if (_isLoadingArtists) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_isLoadingArtistsError != null) {
+      return Center(child: Text(_isLoadingArtistsError!));
+    }
+
+    if (_artists.isEmpty) {
+      return const Center(child: Text("Não há artistas cadastrados"));
+    }
+
+    final sortedArtists = _artists;
+    sortedArtists.sort((a, b) => a.name.compareTo(b.name));
+
+    return ListView.separated(
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      itemCount: sortedArtists.length,
+      itemBuilder: (context, index) {
+        final artist = sortedArtists[index];
+        return ArtistItem(
+          artist: artist,
+          onTap: () => _handleArtistEditDelete(artist),
+        );
+      },
+    );
   }
 
   @override
@@ -105,88 +185,14 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
               children: [
                 Text("Artistas", style: Theme.of(context).textTheme.titleLarge),
                 IconButton(
-                  onPressed: () async {
-                    final newArtist = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ctx) => const AddEditArtistScreen(),
-                      ),
-                    );
-
-                    if (newArtist == null) {
-                      return;
-                    }
-
-                    setState(() {
-                      _artists.add(newArtist);
-                    });
-                  },
+                  onPressed: () => _handleArtistAdd(),
                   icon: const Icon(Icons.add),
                 )
               ],
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: Builder(builder: (context) {
-                if (_isLoadingArtists) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (_isLoadingArtistsError != null) {
-                  return Center(child: Text(_isLoadingArtistsError!));
-                }
-
-                if (_artists.isEmpty) {
-                  return const Center(
-                      child: Text("Não há artistas cadastrados"));
-                }
-
-                final sortedArtists = _artists;
-                sortedArtists.sort((a, b) => a.name.compareTo(b.name));
-
-                return ListView.separated(
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 10),
-                  itemCount: sortedArtists.length,
-                  itemBuilder: (context, index) {
-                    final artist = sortedArtists[index];
-                    return ArtistItem(
-                      artist: artist,
-                      onTap: () async {
-                        final editedRemovedArtist =
-                            await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ArtistDetailsScreen(
-                              artist: artist,
-                            ),
-                          ),
-                        );
-
-                        if (editedRemovedArtist == null) {
-                          return;
-                        }
-
-                        if (editedRemovedArtist is bool &&
-                            editedRemovedArtist) {
-                          setState(() {
-                            _artists = _artists
-                                .where((item) => item.id != artist.id)
-                                .toList();
-                          });
-                          return;
-                        }
-
-                        final oldArtistIndex = _artists.indexWhere(
-                          (item) => item.id == editedRemovedArtist.id,
-                        );
-
-                        setState(() {
-                          _artists[oldArtistIndex] = editedRemovedArtist;
-                        });
-                      },
-                    );
-                  },
-                );
-              }),
+              child: _renderArtists(),
             ),
           ],
         ),

@@ -19,7 +19,8 @@ class ArtistDetailsScreen extends ConsumerStatefulWidget {
   final ArtistModel artist;
 
   @override
-  ConsumerState<ArtistDetailsScreen> createState() => _ArtistDetailsScreenState();
+  ConsumerState<ArtistDetailsScreen> createState() =>
+      _ArtistDetailsScreenState();
 }
 
 class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
@@ -42,6 +43,17 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
       );
 
       final response = await http.get(url);
+
+      if (response.statusCode > 400) {
+        setState(() {
+          _songs = [];
+          _isLoadingSongsError =
+              "Ocorreu um erro inesperado ao tentar carregar as músicas do artista.";
+        });
+
+        return;
+      }
+
       final data = json.decode(response.body);
 
       if (data == null) {
@@ -49,6 +61,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
           _songs = [];
           _isLoadingSongsError = null;
         });
+
         return;
       }
 
@@ -75,14 +88,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         _isLoadingSongsError = null;
       });
     } catch (e) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
-
       setState(() {
         _songs = [];
         _isLoadingSongsError = e.toString();
@@ -111,7 +116,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
     }
 
     setState(() {
-      _wasEdited = true;
       _songs.add(newSong);
     });
   }
@@ -191,7 +195,24 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         'songs/${songData.id}.json',
       );
 
-      await http.delete(url);
+      final response = await http.delete(url);
+
+      if (response.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                  "Ocorreu um erro inesperado ao tentar excluir a música."),
+            ),
+          );
+
+        return;
+      }
 
       setState(() {
         _songs = _songs.where((item) => item.id != songData.id).toList();
@@ -217,7 +238,8 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
+        ..showSnackBar(SnackBar(
+            content: Text(e.toString().replaceAll("Exception: ", ""))));
     }
   }
 
@@ -243,7 +265,9 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
       _wasEdited = true;
     });
 
-    ref.read(favoriteSongsProvider.notifier).updateArtistName(editedArtist.id, editedArtist.name);
+    ref
+        .read(favoriteSongsProvider.notifier)
+        .updateArtistName(editedArtist.id, editedArtist.name);
   }
 
   Future<void> _deleteArtist() async {
@@ -259,6 +283,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
             ),
           ),
         );
+
       return;
     }
 
@@ -304,7 +329,25 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         'artists/${_artistData.id}.json',
       );
 
-      await http.delete(url);
+      final response = await http.delete(url);
+
+      if (response.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao tentar excluir o artista.",
+              ),
+            ),
+          );
+
+        return;
+      }
 
       if (!mounted) {
         return;
@@ -313,7 +356,12 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
-            const SnackBar(content: Text("Artista excluído com sucesso.")));
+          const SnackBar(
+            content: Text(
+              "Artista excluído com sucesso.",
+            ),
+          ),
+        );
 
       Navigator.of(context).pop(true);
     } catch (e) {
@@ -323,7 +371,13 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
     }
   }
 
@@ -375,93 +429,98 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: _loadSongs,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              if (_wasEdited) {
-                Navigator.of(context).pop(_artistData);
-              } else {
-                Navigator.of(context).pop();
-              }
-            },
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            return;
+          }
+
+          if (_wasEdited) {
+            Navigator.of(context).pop(_artistData);
+            return;
+          } 
+
+          Navigator.of(context).pop();
+        },
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext bc) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Wrap(
+                          children: <Widget>[
+                            Column(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.edit),
+                                  title: const Text('Editar Artista'),
+                                  onTap: () => _editArtist(),
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.delete),
+                                  title: const Text('Excluir Artista'),
+                                  onTap: () => _deleteArtist(),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext bc) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Wrap(
-                        children: <Widget>[
-                          Column(
-                            children: [
-                              ListTile(
-                                leading: const Icon(Icons.edit),
-                                title: const Text('Editar Artista'),
-                                onTap: () => _editArtist(),
-                              ),
-                              ListTile(
-                                leading: const Icon(Icons.delete),
-                                title: const Text('Excluir Artista'),
-                                onTap: () => _deleteArtist(),
-                              ),
-                            ],
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                TitleImage(artist: _artistData, isHeader: true),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Músicas",
+                            style: Theme.of(context).textTheme.titleLarge!,
+                          ),
+                          IconButton(
+                            onPressed: () => _addSong(),
+                            icon: const Icon(Icons.add),
                           )
                         ],
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              TitleImage(artist: _artistData, isHeader: true),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Músicas",
-                          style: Theme.of(context).textTheme.titleLarge!,
-                        ),
-                        IconButton(
-                          onPressed: () => _addSong(),
-                          icon: const Icon(Icons.add),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    _renderSongs(),
-                    const SizedBox(height: 20),
-                    Text(
-                      "Sobre",
-                      style: Theme.of(context).textTheme.titleLarge!,
-                      textAlign: TextAlign.left,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      _artistData.description,
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.bodyLarge!,
-                    ),
-                  ],
+                      const SizedBox(height: 20),
+                      _renderSongs(),
+                      const SizedBox(height: 20),
+                      Text(
+                        "Sobre",
+                        style: Theme.of(context).textTheme.titleLarge!,
+                        textAlign: TextAlign.left,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        _artistData.description,
+                        textAlign: TextAlign.left,
+                        style: Theme.of(context).textTheme.bodyLarge!,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -10,7 +10,7 @@ class SongItem extends ConsumerWidget {
     required this.song,
     required this.index,
     this.showDataManipulationActions = true,
-    this.showArtists = false,
+    this.showArtist = false,
     this.onEdit,
     this.onDelete,
   });
@@ -18,14 +18,14 @@ class SongItem extends ConsumerWidget {
   final SongModel song;
   final int index;
   final bool showDataManipulationActions;
-  final bool showArtists;
+  final bool showArtist;
   final void Function()? onEdit;
   final void Function()? onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final subtitle = formatNumber(song.streamsCount) +
-        (showArtists ? " | ${song.artistName}" : "");
+        (showArtist ? " | ${song.artistName}" : "");
 
     return ListTile(
       contentPadding: EdgeInsets.zero,

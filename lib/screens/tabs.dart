@@ -23,7 +23,10 @@ class _TabsScreenState extends State<TabsScreen> {
     switch (identifier) {
       case "sobre":
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const AboutScreen()));
+          MaterialPageRoute(
+            builder: (context) => const AboutScreen(),
+          ),
+        );
       default:
         Navigator.of(context).pop();
     }
