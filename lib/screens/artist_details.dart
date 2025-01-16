@@ -30,6 +30,10 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
 
   Future<void> _loadSongs() async {
     try {
+      setState(() {
+        _isLoadingSongs = true;
+      });
+
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
         'songs.json',
