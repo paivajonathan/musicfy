@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "988582009755",
+    "firebase_url": "https://musicfy-72db4-default-rtdb.firebaseio.com",
+    "project_id": "musicfy-72db4",
+    "storage_bucket": "musicfy-72db4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988582009755:android:ec98c0cffe2efe4c3f1f3e",
+        "android_client_info": {
+          "package_name": "com.musicfy.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnJg3LIDmM6C5TuiYNkKkx6pjlS3SKJV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

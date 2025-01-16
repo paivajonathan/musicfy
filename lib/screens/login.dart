@@ -1,0 +1,178 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:trabalho1/models/user.dart';
+import 'package:trabalho1/providers/user_data.dart';
+import 'package:trabalho1/screens/tabs.dart';
+
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  var _enteredEmail = "";
+  var _enteredPassword = "";
+
+  bool _isButtonLoading = false;
+
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    _formKey.currentState!.save();
+
+    try {
+      setState(() {
+        _isButtonLoading = true;
+      });
+
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _enteredEmail,
+        password: _enteredPassword,
+      );
+
+      ref.read(userDataProvider.notifier).addUserData(
+            UserModel(
+              id: userCredential.user!.uid,
+              email: userCredential.user!.email!,
+              name: userCredential.user!.displayName ?? "Sem nome",
+            ),
+          );
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return const TabsScreen();
+          },
+        ),
+      );
+    } on FirebaseException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'Não foi encontrado um usuário com esse email.';
+          break;
+        case 'wrong-password':
+          message = 'Senha incorreta.';
+          break;
+        case 'network-request-failed':
+          message = 'Por favor verifique a sua conexão com a internet.';
+          break;
+        default:
+          message = 'Um erro inesperado ocorreu. Por favor, tente novamente.';
+      }
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+    } on Exception catch (e) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
+    } finally {
+      setState(() {
+        _isButtonLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Login"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextFormField(
+                    maxLength: 50,
+                    decoration: const InputDecoration(
+                      label: Text('Email'),
+                    ),
+                    initialValue: _enteredEmail,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length > 50) {
+                        return 'Deve ter entre 1 e 50 caracteres';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _enteredEmail = value!;
+                    },
+                  ),
+                  TextFormField(
+                    maxLength: 50,
+                    decoration: const InputDecoration(
+                      label: Text('Senha'),
+                    ),
+                    initialValue: _enteredPassword,
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length > 50) {
+                        return 'Deve ter entre 1 e 50 caracteres';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _enteredPassword = value!;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: Size(MediaQuery.of(context).size.width, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    onPressed: _isButtonLoading ? null : () => _login(),
+                    child: _isButtonLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator())
+                        : const Text("Login"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
