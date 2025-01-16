@@ -6,20 +6,26 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:trabalho1/models/artist.dart';
 
-class AddArtistScreen extends StatefulWidget {
-  const AddArtistScreen({super.key});
+class AddEditArtistScreen extends StatefulWidget {
+  const AddEditArtistScreen({super.key, this.artistData});
+
+  final ArtistModel? artistData;
 
   @override
-  State<AddArtistScreen> createState() => _AddArtistScreenState();
+  State<AddEditArtistScreen> createState() => _AddEditArtistScreenState();
 }
 
-class _AddArtistScreenState extends State<AddArtistScreen> {
+class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  var _enteredName = "";
-  var _enteredDescription = "";
-  var _enteredFollowersQuantity = 0;
-  var _enteredImageURL = "";
+  late var _enteredName =
+      widget.artistData != null ? widget.artistData!.name : "";
+  late var _enteredDescription =
+      widget.artistData != null ? widget.artistData!.description : "";
+  late var _enteredFollowersQuantity =
+      widget.artistData != null ? widget.artistData!.followers : 0;
+  late var _enteredImageURL =
+      widget.artistData != null ? widget.artistData!.imageUrl : "";
 
   bool _isButtonLoading = false;
 
@@ -75,6 +81,56 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
     }
   }
 
+  Future<void> _editArtist() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    _formKey.currentState!.save();
+
+    try {
+      setState(() {
+        _isButtonLoading = true;
+      });
+
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'artists/${widget.artistData!.id}.json',
+      );
+
+      await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(
+          {
+            'name': _enteredName,
+            'description': _enteredDescription,
+            'followersQuantity': _enteredFollowersQuantity,
+            'imageURL': _enteredImageURL,
+          },
+        ),
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop(ArtistModel(
+        id: widget.artistData!.id,
+        name: _enteredName,
+        imageUrl: _enteredImageURL,
+        followers: _enteredFollowersQuantity,
+        description: _enteredDescription,
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() {
+        _isButtonLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -83,7 +139,9 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Adicionar Artista"),
+          title: widget.artistData != null
+              ? const Text("Editar Artista")
+              : const Text("Adicionar Artista"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20),
@@ -97,6 +155,7 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                     decoration: const InputDecoration(
                       label: Text('Nome'),
                     ),
+                    initialValue: _enteredName,
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
@@ -114,6 +173,7 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                     decoration: const InputDecoration(
                       label: Text('Descrição'),
                     ),
+                    initialValue: _enteredDescription,
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
@@ -152,6 +212,7 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                     decoration: const InputDecoration(
                       label: Text('URL da Imagem'),
                     ),
+                    initialValue: _enteredImageURL,
                     keyboardType: TextInputType.url,
                     validator: (value) {
                       if (value == null ||
@@ -173,13 +234,19 @@ class _AddArtistScreenState extends State<AddArtistScreen> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                     ),
-                    onPressed: _isButtonLoading ? null : () => _saveArtist(),
+                    onPressed: _isButtonLoading
+                        ? null
+                        : widget.artistData != null
+                            ? () => _editArtist()
+                            : () => _saveArtist(),
                     child: _isButtonLoading
                         ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator())
-                        : const Text('Adicionar'),
+                        : widget.artistData != null
+                            ? const Text("Editar")
+                            : const Text('Adicionar'),
                   ),
                 ],
               ),

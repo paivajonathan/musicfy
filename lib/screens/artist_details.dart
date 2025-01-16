@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho1/models/artist.dart';
 import 'package:trabalho1/models/song.dart';
+import 'package:trabalho1/screens/add_artist.dart';
 import 'package:trabalho1/screens/add_song.dart';
 import 'package:trabalho1/widgets/song_item.dart';
 import 'dart:convert';
@@ -8,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:trabalho1/widgets/title_image.dart';
 
 class ArtistDetailsScreen extends StatefulWidget {
-  const ArtistDetailsScreen({
+  ArtistDetailsScreen({
     super.key,
     required this.artist,
   });
@@ -23,6 +24,9 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
   List<SongModel> _songs = [];
   bool _isLoadingSongs = true;
   String? _isLoadingSongsError;
+
+  bool _wasEdited = false;
+  late ArtistModel _artistData = widget.artist;
 
   Future<void> _loadSongs() async {
     try {
@@ -45,7 +49,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
       final List<SongModel> loadedItems = [];
 
       for (final item in data.entries) {
-        if (item.value["artistId"] != widget.artist.id) {
+        if (item.value["artistId"] != _artistData.id) {
           continue;
         }
 
@@ -98,6 +102,16 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if (_wasEdited) {
+                Navigator.of(context).pop(_artistData);
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.more_vert),
@@ -114,7 +128,29 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                               ListTile(
                                 leading: const Icon(Icons.edit),
                                 title: const Text('Editar Artista'),
-                                onTap: () => {},
+                                onTap: () async {
+                                  Navigator.of(context).pop();
+
+                                  final editedArtist =
+                                      await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return AddEditArtistScreen(
+                                          artistData: _artistData,
+                                        );
+                                      },
+                                    ),
+                                  );
+
+                                  if (editedArtist == null) {
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    _artistData = editedArtist;
+                                    _wasEdited = true;
+                                  });
+                                },
                               ),
                               ListTile(
                                 leading: const Icon(Icons.delete),
@@ -135,7 +171,7 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              TitleImage(artist: widget.artist, isHeader: true),
+              TitleImage(artist: _artistData, isHeader: true),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -143,33 +179,30 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.settings, color: Colors.transparent),
-                        ),
                         Text(
                           "Músicas",
                           style: Theme.of(context).textTheme.titleLarge!,
                         ),
                         IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
+                          onPressed: () async {
+                            final newSong = await Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) {
                                   return AddSongScreen(
-                                    artistId: widget.artist.id,
-                                    artistName: widget.artist.name,
+                                    artistId: _artistData.id,
+                                    artistName: _artistData.name,
                                   );
                                 },
                               ),
-                            ).then((newSong) {
-                              if (newSong == null) {
-                                return;
-                              }
+                            );
 
-                              setState(() {
-                                _songs.add(newSong);
-                              });
+                            if (newSong == null) {
+                              return;
+                            }
+
+                            setState(() {
+                              _wasEdited = true;
+                              _songs.add(newSong);
                             });
                           },
                           icon: const Icon(Icons.add),
@@ -212,10 +245,11 @@ class _ArtistDetailsScreenState extends State<ArtistDetailsScreen> {
                     Text(
                       "Sobre",
                       style: Theme.of(context).textTheme.titleLarge!,
+                      textAlign: TextAlign.left,
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.artist.description,
+                      _artistData.description,
                       textAlign: TextAlign.left,
                       style: Theme.of(context).textTheme.bodyLarge!,
                     ),

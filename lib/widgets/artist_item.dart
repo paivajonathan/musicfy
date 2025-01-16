@@ -7,9 +7,11 @@ class ArtistItem extends StatelessWidget {
   const ArtistItem({
     super.key,
     required this.artist,
+    required this.onTap,
   });
 
   final ArtistModel artist;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +20,7 @@ class ArtistItem extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       elevation: 2,
       child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ArtistDetailsScreen(artist: artist)
-            )
-          );
-        },
+        onTap: onTap,
         child: TitleImage(artist: artist),
       ),
     );

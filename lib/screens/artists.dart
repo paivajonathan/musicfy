@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:trabalho1/models/artist.dart';
 import 'package:trabalho1/screens/add_artist.dart';
+import 'package:trabalho1/screens/artist_details.dart';
 import 'package:trabalho1/widgets/artist_item.dart';
 import 'package:http/http.dart' as http;
 
@@ -96,14 +97,14 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
                   onPressed: () async {
                     final newArtist = await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (ctx) => const AddArtistScreen(),
+                        builder: (ctx) => const AddEditArtistScreen(),
                       ),
                     );
-      
+
                     if (newArtist == null) {
                       return;
                     }
-      
+
                     setState(() {
                       _artists.add(newArtist);
                     });
@@ -118,25 +119,55 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
                 if (_isLoadingArtists) {
                   return const Center(child: CircularProgressIndicator());
                 }
-      
+
                 if (_isLoadingArtistsError != null) {
                   return Center(child: Text(_isLoadingArtistsError!));
                 }
-      
+
                 if (_artists.isEmpty) {
-                  return const Center(child: Text("Não há artistas cadastrados"));
+                  return const Center(
+                      child: Text("Não há artistas cadastrados"));
                 }
-      
+
                 final sortedArtists = _artists;
                 sortedArtists.sort((a, b) => a.name.compareTo(b.name));
-      
+
                 return ListView.separated(
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 10),
                   itemCount: sortedArtists.length,
                   itemBuilder: (context, index) {
                     final artist = sortedArtists[index];
-                    return ArtistItem(artist: artist);
+                    return ArtistItem(
+                      artist: artist,
+                      onTap: () async {
+                        final editedRemovedArtist =
+                            await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ArtistDetailsScreen(
+                              artist: artist,
+                            ),
+                          ),
+                        );
+
+                        if (editedRemovedArtist == null) {
+                          return;
+                        }
+
+                        if (editedRemovedArtist is bool &&
+                            editedRemovedArtist) {
+                          print("Removido");
+                        }
+
+                        final oldArtistIndex = _artists.indexWhere(
+                          (item) => item.id == editedRemovedArtist.id,
+                        );
+
+                        setState(() {
+                          _artists[oldArtistIndex] = editedRemovedArtist;
+                        });
+                      },
+                    );
                   },
                 );
               }),

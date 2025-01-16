@@ -43,7 +43,7 @@ class SongItem extends StatelessWidget {
                   children: <Widget>[
                     ListTile(
                       leading: const Icon(Icons.favorite),
-                      title: const Text('Adicionar aos favoritos'),
+                      title: const Text('Adicionar aos Favoritos'),
                       onTap: () => {},
                     ),
                     if (showDataManipulationActions)
