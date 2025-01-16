@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:trabalho1/helpers/validators.dart';
 import 'package:trabalho1/models/user.dart';
 import 'package:trabalho1/providers/user_data.dart';
 import 'package:trabalho1/screens/register.dart';
@@ -187,6 +187,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           value.trim().length > 100) {
                         return 'Deve ter entre 1 e 100 caracteres';
                       }
+
+                      if (!isEmailValid(value)) {
+                        return 'Email inválido';
+                      }
+
                       return null;
                     },
                     onSaved: (value) {

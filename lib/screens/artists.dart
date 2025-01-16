@@ -20,16 +20,16 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
   String? _isLoadingArtistsError;
 
   @override
+  void initState() {
+    super.initState();
+    _loadArtists();
+  }
+
+  @override
   void setState(fn) {
     if (mounted) {
       super.setState(fn);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadArtists();
   }
 
   Future<void> _loadArtists() async {

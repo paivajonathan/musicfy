@@ -31,6 +31,19 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
   bool _wasEdited = false;
   late ArtistModel _artistData = widget.artist;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadSongs();
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   Future<void> _loadSongs() async {
     try {
       setState(() {
@@ -99,7 +112,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
     }
   }
 
-  Future<void> _addSong() async {
+  Future<void> _handleSongAdd() async {
     final newSong = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
@@ -120,7 +133,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
     });
   }
 
-  Future<void> _editSong(SongModel songData) async {
+  Future<void> _handleSongEdit(SongModel songData) async {
     Navigator.of(context).pop();
 
     final editedSong = await Navigator.of(context).push(
@@ -243,7 +256,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
     }
   }
 
-  Future<void> _editArtist() async {
+  Future<void> _handleArtistEdit() async {
     Navigator.of(context).pop();
 
     final editedArtist = await Navigator.of(context).push(
@@ -270,7 +283,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         .updateArtistName(editedArtist.id, editedArtist.name);
   }
 
-  Future<void> _deleteArtist() async {
+  Future<void> _handleArtistDelete() async {
     Navigator.of(context).pop();
 
     if (_songs.isNotEmpty) {
@@ -381,12 +394,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadSongs();
-  }
-
   Widget _renderSongs() {
     if (_isLoadingSongs) {
       return const Center(
@@ -418,7 +425,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
           SongItem(
             song: song,
             index: index,
-            onEdit: () => _editSong(song),
+            onEdit: () => _handleSongEdit(song),
             onDelete: () => _deleteSong(song),
           )
       ],
@@ -463,12 +470,12 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
                                 ListTile(
                                   leading: const Icon(Icons.edit),
                                   title: const Text('Editar Artista'),
-                                  onTap: () => _editArtist(),
+                                  onTap: () => _handleArtistEdit(),
                                 ),
                                 ListTile(
                                   leading: const Icon(Icons.delete),
                                   title: const Text('Excluir Artista'),
-                                  onTap: () => _deleteArtist(),
+                                  onTap: () => _handleArtistDelete(),
                                 ),
                               ],
                             )
@@ -497,7 +504,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
                             style: Theme.of(context).textTheme.titleLarge!,
                           ),
                           IconButton(
-                            onPressed: () => _addSong(),
+                            onPressed: () => _handleSongAdd(),
                             icon: const Icon(Icons.add),
                           )
                         ],
