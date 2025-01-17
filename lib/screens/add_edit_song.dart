@@ -68,7 +68,8 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(const SnackBar(content: Text("Música adicionada com sucesso.")));
+        ..showSnackBar(
+            const SnackBar(content: Text("Música adicionada com sucesso.")));
 
       Navigator.of(context).pop(
         SongModel(
@@ -124,7 +125,8 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(const SnackBar(content: Text("Informações da música editadas com sucesso.")));
+        ..showSnackBar(const SnackBar(
+            content: Text("Informações da música editadas com sucesso.")));
 
       Navigator.of(context).pop(
         SongModel(
@@ -182,6 +184,9 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
                     onSaved: (value) {
                       _enteredTitle = value!;
                     },
+                  ),
+                  const SizedBox(
+                    height: 20,
                   ),
                   TextFormField(
                     maxLength: 10,

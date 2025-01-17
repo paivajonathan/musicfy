@@ -177,9 +177,19 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         description: _enteredDescription,
       ));
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
     } finally {
       setState(() {
         _isButtonLoading = false;
@@ -224,6 +234,9 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                       _enteredName = value!;
                     },
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     maxLength: 500,
                     decoration: const InputDecoration(
@@ -241,6 +254,9 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                     onSaved: (value) {
                       _enteredDescription = value!;
                     },
+                  ),
+                  const SizedBox(
+                    height: 20,
                   ),
                   TextFormField(
                     maxLength: 10,
@@ -262,6 +278,9 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                     onSaved: (value) {
                       _enteredFollowersQuantity = int.parse(value!);
                     },
+                  ),
+                  const SizedBox(
+                    height: 20,
                   ),
                   TextFormField(
                     maxLength: 300,
@@ -291,7 +310,9 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                       _enteredImageUrl = value!;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       fixedSize: Size(MediaQuery.of(context).size.width, 50),
