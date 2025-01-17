@@ -4,7 +4,6 @@ class SongModel {
     required this.title,
     required this.streamsCount,
     required this.artistId,
-    required this.artistName,
     required this.favoritedBy,
   });
 
@@ -12,7 +11,6 @@ class SongModel {
   String title;
   int streamsCount;
   String artistId;
-  String artistName;
   List<String> favoritedBy;
 
   SongModel copyWith({
@@ -20,7 +18,6 @@ class SongModel {
     String? title,
     int? streamsCount,
     String? artistId,
-    String? artistName,
     List<String>? favoritedBy,
   }) {
     return SongModel(
@@ -28,7 +25,6 @@ class SongModel {
       title: title ?? this.title,
       streamsCount: streamsCount ?? this.streamsCount,
       artistId: artistId ?? this.artistId,
-      artistName: artistName ?? this.artistName,
       favoritedBy: favoritedBy ?? this.favoritedBy,
     );
   }

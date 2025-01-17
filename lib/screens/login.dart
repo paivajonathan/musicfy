@@ -96,7 +96,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             title: item.value["title"],
             streamsCount: item.value["streamsCount"],
             artistId: item.value["artistId"],
-            artistName: item.value["artistName"],
             favoritedBy: favoritedBy,
           ));
         }
@@ -232,7 +231,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             title: item.value["title"],
             streamsCount: item.value["streamsCount"],
             artistId: item.value["artistId"],
-            artistName: item.value["artistName"],
             favoritedBy: favoritedBy,
           ));
         }

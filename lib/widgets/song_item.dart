@@ -14,7 +14,6 @@ class SongItem extends ConsumerStatefulWidget {
     required this.song,
     required this.index,
     this.showDataManipulationActions = true,
-    this.showArtist = false,
     this.onEdit,
     this.onDelete,
   });
@@ -22,7 +21,6 @@ class SongItem extends ConsumerStatefulWidget {
   final SongModel song;
   final int index;
   final bool showDataManipulationActions;
-  final bool showArtist;
   final void Function()? onEdit;
   final void Function()? onDelete;
 
@@ -185,8 +183,7 @@ class _SongItemState extends ConsumerState<SongItem> {
   Widget build(BuildContext context) {
     final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
 
-    final subtitle = formatNumber(widget.song.streamsCount) +
-        (widget.showArtist ? " | ${widget.song.artistName}" : "");
+    final subtitle = formatNumber(widget.song.streamsCount);
 
     return ListTile(
       contentPadding: EdgeInsets.zero,

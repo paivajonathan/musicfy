@@ -22,15 +22,6 @@ class FavoriteSongsNotifier extends StateNotifier<List<SongModel>> {
     }).toList();
   }
 
-  void updateArtistName(String artistId, String newArtistName) {
-    state = state.map((song) {
-      if (song.artistId == artistId) {
-        return song.copyWith(artistName: newArtistName);
-      }
-      return song;
-    }).toList();
-  }
-
   void removeSong(SongModel songToRemove) {
     state = state.where((song) => song.id != songToRemove.id).toList();
   }

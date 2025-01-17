@@ -10,12 +10,10 @@ class AddEditSongScreen extends StatefulWidget {
   const AddEditSongScreen({
     super.key,
     required this.artistId,
-    required this.artistName,
     this.songData,
   });
 
   final String artistId;
-  final String artistName;
   final SongModel? songData;
 
   @override
@@ -47,6 +45,46 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
         'songs.json',
       );
 
+      final getSongsResponse = await http.get(url);
+
+      if (getSongsResponse.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao adicionar a música.",
+              ),
+            ),
+          );
+      }
+
+      final getSongsResponseData = json.decode(getSongsResponse.body);
+
+      for (final item in getSongsResponseData.entries) {
+        if (item.value["title"] == _enteredTitle) {
+          if (!mounted) {
+            return;
+          }
+
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Já existe uma outra música com esse nome.",
+                ),
+              ),
+            );
+
+          return;
+        }
+      }
+
       final response = await http.post(
         url,
         headers: {
@@ -57,7 +95,6 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
             'title': _enteredTitle,
             'streamsCount': _enteredStreamsCount,
             'artistId': widget.artistId,
-            'artistName': widget.artistName,
           },
         ),
       );
@@ -77,7 +114,6 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
           title: _enteredTitle,
           streamsCount: _enteredStreamsCount,
           artistId: widget.artistId,
-          artistName: widget.artistName,
           favoritedBy: [],
         ),
       );
@@ -102,6 +138,51 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
         _isButtonLoading = true;
       });
 
+      final getSongsUrl = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'songs.json',
+      );
+
+      final getSongsResponse = await http.get(getSongsUrl);
+
+      if (getSongsResponse.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao editar a música.",
+              ),
+            ),
+          );
+      }
+
+      final getSongsResponseData = json.decode(getSongsResponse.body);
+
+      for (final item in getSongsResponseData.entries) {
+        if (item.value["title"] == _enteredTitle && item.key != widget.songData!.id) {
+          if (!mounted) {
+            return;
+          }
+
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Já existe uma outra música com esse nome.",
+                ),
+              ),
+            );
+
+          return;
+        }
+      }
+
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
         'songs/${widget.songData!.id}.json',
@@ -117,7 +198,6 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
             'title': _enteredTitle,
             'streamsCount': _enteredStreamsCount,
             'artistId': widget.artistId,
-            'artistName': widget.artistName,
           },
         ),
       );
@@ -135,7 +215,6 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
           title: _enteredTitle,
           streamsCount: _enteredStreamsCount,
           artistId: widget.artistId,
-          artistName: widget.artistName,
           favoritedBy: widget.songData!.favoritedBy,
         ),
       );

@@ -97,7 +97,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
             title: item.value["title"],
             streamsCount: item.value["streamsCount"],
             artistId: item.value["artistId"],
-            artistName: item.value["artistName"],
             favoritedBy: favoritedBy,
           ),
         );
@@ -125,7 +124,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         builder: (context) {
           return AddEditSongScreen(
             artistId: _artistData.id,
-            artistName: _artistData.name,
           );
         },
       ),
@@ -148,7 +146,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         builder: (context) {
           return AddEditSongScreen(
             artistId: _artistData.id,
-            artistName: _artistData.name,
             songData: songData,
           );
         },
@@ -284,10 +281,6 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
       _artistData = editedArtist;
       _wasEdited = true;
     });
-
-    ref
-        .read(favoriteSongsProvider.notifier)
-        .updateArtistName(editedArtist.id, editedArtist.name);
   }
 
   Future<void> _handleArtistDelete() async {
