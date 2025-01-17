@@ -4,16 +4,22 @@ A música que você busca, no lugar que você está.
 
 ## Requisitos
 
-1. A aplicação deve ter uma tela inicial com uma AppBar para exibição de algum texto relativo ao seu aplicativo.
-2. A tela inicial deve conter uma BottomNavigationBar com pelo menos duas abas identificadas por ícones. Cada aba deve levar o usuário a telas com informações e/ou funções diferentes.
-3. Além da tela inicial, o aplicativo deve implementar uma tela secundária que modifica o seu conteúdo dependendo da escolha que o usuário fizer em uma das telas iniciais. Essa tela secundária deve conter uma AppBar com o botão de retorno à tela inicial.
-4. Em alguma tela é necessário exibir widgets semelhantes organizados de forma estruturada e que utilizam dados salvos em um arquivo para a exibição de informações ou definição de propriedades do próprio widget (ex. cor).
-5. A aplicação deve implementar um SideDrawer que deve implementar uma opção que leva o usuário para uma tela onde são exibidas as informações sobre os membros do grupo e a aplicação. Caso necessário, o SideDrawer pode ser usado para navegar para outros telas.
-6. A navegação entre as telas deve ser feita utilizando o Navigator 1.0 disponível no Flutter.
-7. Os dados a serem utilizados na aplicação devem estar disponíveis em um arquivo. Todos os dados relevantes devem ser representados através de objetos na aplicação.
-8. Não é aceitável utilizar qualquer widget ou recurso que não seja nativo do Flutter.
-9. É necessário estruturar o código como: feature first ou layer first.
-10. Estruture o código e os elementos de interface buscando otimizar o reaproveitamento de widgets e código.
+### Requisitos mínimos:
+
+- [ ]  Os dados da aplicação deverão estar salvos em um banco de dados acessível através da internet: preferencialmente uma tecnologia consolidada no mercado de aplicações móveis. Considere o padrão CRUD como requisito mínimo.
+- [ ]  O aplicativo deve implementar recursos para garantir que as requisições ao banco de dados não interropam o fluxo do programa;
+- [ ]  A aplicação deve implementar formas de reduzir a quantidade de requisições ao servidor de dados, priorizando transações locais sempre que possível;
+- [ ]  O envio de dados ao DB deve ser validado para não acontecerem incoerências de tipo, estrutura, formato, etc.
+- [ ]  A aplicação deve tratar os erros de forma consistente e eficiente. Exibindo as principais mensagens de erro e evitando comportamentos estranhos na aplicação.
+- [ ]  A aplicação deve implementar pelo menos duas formas de controle de estado relevantes ao funcionamento do aplicativo. *Sugestões: lista de favoritos, controle de navegação, controle de usuário(só faz sentido implementando perfis de usuário), configurações da aplicação, manter dados em formulários, validar dados em tempo real, histórico de navegação do usuário.*
+- [ ]  A aplicação deve implementar um mecanismo de login e controle do usuário.
+
+### Requisitos extras:
+
+Para cada requisito extra implementado, um requisito minimo poderá ser desconsiderado na avaliação.
+
+- [ ]  Implementar alguma forma de notificação através do sistema sobre eventos importantes. As notificações não devem depender de interações do usuário, mas de eventos que são disparados por outros contextos.
+- [ ]  Implementar uma forma de login, informações e controle de usuário com alguma API de terceiros. *Por exemplo: Google, Facebook, Apple, etc.*
 
 ## Demonstração das Telas
 
