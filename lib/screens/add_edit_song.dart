@@ -78,6 +78,7 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
           streamsCount: _enteredStreamsCount,
           artistId: widget.artistId,
           artistName: widget.artistName,
+          favoritedBy: [],
         ),
       );
     } catch (e) {
@@ -106,7 +107,7 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
         'songs/${widget.songData!.id}.json',
       );
 
-      await http.put(
+      await http.patch(
         url,
         headers: {
           'Content-Type': 'application/json',
@@ -135,6 +136,7 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
           streamsCount: _enteredStreamsCount,
           artistId: widget.artistId,
           artistName: widget.artistName,
+          favoritedBy: widget.songData!.favoritedBy,
         ),
       );
     } catch (e) {

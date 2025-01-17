@@ -253,7 +253,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         'artists/${widget.artistData!.id}.json',
       );
 
-      await http.put(
+      await http.patch(
         url,
         headers: {
           'Content-Type': 'application/json',

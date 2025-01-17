@@ -48,21 +48,18 @@ class _SongItemState extends ConsumerState<SongItem> {
 
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
-        'users/${userDataState!.id}/favoriteSongs/${widget.song.id}.json',
+        'songs/${widget.song.id}/favoritedBy/${userDataState!.id}.json',
       );
 
-      final response = await http.put(
+      final response = await http.patch(
         url,
         headers: {
           'Content-Type': 'application/json',
         },
         body: json.encode(
           {
-            'title': widget.song.title,
-            'streamsCount': widget.song.streamsCount,
-            'artistId': widget.song.artistId,
-            'artistName': widget.song.artistName,
-          },
+            'favorited': true
+          }
         ),
       );
 
@@ -130,7 +127,7 @@ class _SongItemState extends ConsumerState<SongItem> {
 
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
-        'users/${userDataState!.id}/favoriteSongs/${widget.song.id}.json',
+        'songs/${widget.song.id}/favoritedBy/${userDataState!.id}.json',
       );
 
       final response = await http.delete(url);

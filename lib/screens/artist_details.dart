@@ -85,6 +85,12 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
           continue;
         }
 
+        List<String> favoritedBy = [];
+
+        for (final favoritedItem in (item.value["favoritedBy"] ?? {}).entries) {
+          favoritedBy.add(favoritedItem.key);
+        }
+
         loadedItems.add(
           SongModel(
             id: item.key,
@@ -92,6 +98,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
             streamsCount: item.value["streamsCount"],
             artistId: item.value["artistId"],
             artistName: item.value["artistName"],
+            favoritedBy: favoritedBy,
           ),
         );
       }

@@ -53,7 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
-        'users/${userCredential.user!.uid}/favoriteSongs.json',
+        'songs.json',
       );
 
       final response = await http.get(url);
@@ -80,12 +80,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (responseData != null) {
         for (final item in responseData.entries) {
+          List<String> favoritedBy = [];
+
+          for (final favoritedItem
+              in (item.value["favoritedBy"] ?? {}).entries) {
+            favoritedBy.add(favoritedItem.key);
+          }
+
+          if (!favoritedBy.contains(userCredential.user!.uid)) {
+            continue;
+          }
+
           favoriteSongs.add(SongModel(
             id: item.key,
             title: item.value["title"],
             streamsCount: item.value["streamsCount"],
             artistId: item.value["artistId"],
             artistName: item.value["artistName"],
+            favoritedBy: favoritedBy,
           ));
         }
       }
@@ -177,7 +189,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
-        'users/${userCredential.user!.uid}/favoriteSongs.json',
+        'songs.json',
       );
 
       final response = await http.get(url);
@@ -204,12 +216,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (responseData != null) {
         for (final item in responseData.entries) {
+          List<String> favoritedBy = [];
+
+          for (final favoritedItem
+              in (item.value["favoritedBy"] ?? {}).entries) {
+            favoritedBy.add(favoritedItem.key);
+          }
+
+          if (!favoritedBy.contains(userCredential.user!.uid)) {
+            continue;
+          }
+
           favoriteSongs.add(SongModel(
             id: item.key,
             title: item.value["title"],
             streamsCount: item.value["streamsCount"],
             artistId: item.value["artistId"],
             artistName: item.value["artistName"],
+            favoritedBy: favoritedBy,
           ));
         }
       }
