@@ -65,6 +65,7 @@ class TitleImage extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineLarge!.copyWith(
                   color: Colors.white,
                 ),
+                textAlign: TextAlign.center,
               ),
         )
       ],
