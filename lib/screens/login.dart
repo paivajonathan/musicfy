@@ -124,6 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     } on FirebaseException catch (e) {
       String message;
+
       switch (e.code) {
         case 'user-not-found':
           message = 'Não foi encontrado um usuário com esse email.';
@@ -133,6 +134,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           break;
         case 'network-request-failed':
           message = 'Por favor verifique a sua conexão com a internet.';
+          break;
+        case 'invalid-credential':
+          message = 'Email e/ou senha incorreto(s)';
           break;
         default:
           message = 'Um erro inesperado ocorreu. Por favor, tente novamente.';

@@ -40,18 +40,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _enteredPassword,
       );
 
-      if (!mounted) {
-        return;
-      }
-
       if (userCredential.user == null) {
+        if (!mounted) {
+          return;
+        }
+
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(
             const SnackBar(
-              content: Text("Ocorreu um erro inesperado, tente novamente."),
+              content: Text("Ocorreu um erro inesperado ao cadastrar a conta."),
             ),
           );
+
+        return;
       }
 
       await userCredential.user!.updateDisplayName(_enteredName);
@@ -79,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           message = 'A senha digitada é muito fraca.';
           break;
         case 'email-already-in-use':
-          message = 'Já existe uma conta com esse email';
+          message = 'Já existe uma conta com esse email.';
           break;
         default:
           message = 'Um erro inesperado ocorreu. Por favor, tente novamente.';
@@ -194,8 +196,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: !_isPasswordVisible,
                     initialValue: _enteredPassword,
                     validator: (value) {
-                      if (value == null || value.isEmpty || value.trim().length < 8) {
-                        return 'Deve ter pelo menos 8 caracteres.';
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length < 8) {
+                        return 'Deve ter pelo menos 8 caracteres';
                       }
 
                       if (value.trim().length > 50) {
@@ -236,8 +240,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: !_isPasswordConfirmationVisible,
                     initialValue: _enteredPasswordConfirmation,
                     validator: (value) {
-                      if (value == null || value.isEmpty || value.trim().length < 8) {
-                        return 'Deve ter pelo menos 8 caracteres.';
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length < 8) {
+                        return 'Deve ter pelo menos 8 caracteres';
                       }
 
                       if (value.trim().length > 50) {
