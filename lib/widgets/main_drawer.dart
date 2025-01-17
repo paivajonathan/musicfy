@@ -29,14 +29,25 @@ class MainDrawer extends ConsumerWidget {
               borderRadius:
                   const BorderRadius.only(bottomRight: Radius.circular(20)),
             ),
-            child: Center(
-              child: (userData != null)
-                  ? Text(userData.name, style: Theme.of(context).textTheme.titleLarge!)
-                  : Text("Usuário Não Identificado", style: Theme.of(context).textTheme.titleLarge!),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: (userData != null)
+                    ? Text(
+                        userData.name,
+                        style: Theme.of(context).textTheme.titleLarge!,
+                        textAlign: TextAlign.center,
+                      )
+                    : Text(
+                        "Usuário Não Identificado",
+                        style: Theme.of(context).textTheme.titleLarge!,
+                        textAlign: TextAlign.center,
+                      ),
+              ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: Column(
               children: [
                 ListTile(
@@ -44,8 +55,8 @@ class MainDrawer extends ConsumerWidget {
                     Icons.home,
                     size: 26,
                   ),
-                  title:
-                      Text("Inicial", style: Theme.of(context).textTheme.titleLarge!),
+                  title: Text("Inicial",
+                      style: Theme.of(context).textTheme.titleLarge!),
                   onTap: () {
                     onSelectedScreen("inicial");
                   },
@@ -75,16 +86,17 @@ class MainDrawer extends ConsumerWidget {
                   onTap: () async {
                     await FirebaseAuth.instance.signOut();
                     await GoogleSignIn().signOut();
-                
+
                     ref.read(userDataProvider.notifier).removeUserData();
                     ref.read(favoriteSongsProvider.notifier).removeSongs();
-                
+
                     if (!context.mounted) {
                       return;
                     }
-                
+
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
                       (Route<dynamic> route) => false,
                     );
                   },
