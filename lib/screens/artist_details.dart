@@ -523,46 +523,45 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                TitleImage(artist: _artistData, isHeader: true),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Músicas",
-                            style: Theme.of(context).textTheme.titleLarge!,
-                          ),
-                          IconButton(
-                            onPressed: () => _handleSongAdd(),
-                            icon: const Icon(Icons.add),
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      _renderSongs(),
-                      const SizedBox(height: 20),
-                      Text(
-                        "Sobre",
-                        style: Theme.of(context).textTheme.titleLarge!,
-                        textAlign: TextAlign.left,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        _artistData.description,
-                        textAlign: TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyLarge!,
-                      ),
-                    ],
-                  ),
+          body: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              TitleImage(artist: _artistData, isHeader: true),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Músicas",
+                          style: Theme.of(context).textTheme.titleLarge!,
+                        ),
+                        IconButton(
+                          onPressed: () => _handleSongAdd(),
+                          icon: const Icon(Icons.add),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _renderSongs(),
+                    const SizedBox(height: 20),
+                    Text(
+                      "Sobre",
+                      style: Theme.of(context).textTheme.titleLarge!,
+                      textAlign: TextAlign.left,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      _artistData.description,
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.bodyLarge!,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
