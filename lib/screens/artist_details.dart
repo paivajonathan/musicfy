@@ -106,10 +106,15 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         _songs = loadedItems;
         _isLoadingSongsError = null;
       });
+    } on http.ClientException catch (_) {
+      setState(() {
+        _songs = [];
+        _isLoadingSongsError = "Verifique a sua conexão com a internet.";
+      });
     } catch (e) {
       setState(() {
         _songs = [];
-        _isLoadingSongsError = e.toString();
+        _isLoadingSongsError = e.toString().replaceAll("Exception: ", "");
       });
     } finally {
       setState(() {
@@ -224,7 +229,8 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
           ..showSnackBar(
             const SnackBar(
               content: Text(
-                  "Ocorreu um erro inesperado ao tentar excluir a música."),
+                "Ocorreu um erro inesperado ao tentar excluir a música.",
+              ),
             ),
           );
 
@@ -248,6 +254,18 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         );
 
       ref.read(favoriteSongsProvider.notifier).removeSong(songData);
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
     } catch (e) {
       if (!mounted) {
         return;
@@ -255,8 +273,13 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-            content: Text(e.toString().replaceAll("Exception: ", ""))));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
     }
   }
 
@@ -283,7 +306,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
     });
   }
 
-  Future<void> _handleArtistDelete() async {
+  Future<void> _deleteArtist() async {
     Navigator.of(context).pop();
 
     try {
@@ -412,6 +435,14 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
         );
 
       Navigator.of(context).pop(true);
+    } on http.ClientException catch (_) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet"),
+          ),
+        );
     } catch (e) {
       if (!mounted) {
         return;
@@ -510,7 +541,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
                                 ListTile(
                                   leading: const Icon(Icons.delete),
                                   title: const Text('Excluir Artista'),
-                                  onTap: () => _handleArtistDelete(),
+                                  onTap: () => _deleteArtist(),
                                 ),
                               ],
                             )

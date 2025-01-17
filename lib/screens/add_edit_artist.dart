@@ -157,6 +157,18 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         followers: _enteredFollowersQuantity,
         description: _enteredDescription,
       ));
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
     } catch (e) {
       if (!mounted) {
         return;
@@ -164,8 +176,13 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(
-            content: Text(e.toString().replaceAll("Exception: ", ""))));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
     } finally {
       setState(() {
         _isButtonLoading = false;
@@ -229,7 +246,8 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
       final getArtistsResponseData = json.decode(getArtistsResponse.body);
 
       for (final item in getArtistsResponseData.entries) {
-        if (item.value["name"] == _enteredName && item.key != widget.artistData!.id) {
+        if (item.value["name"] == _enteredName &&
+            item.key != widget.artistData!.id) {
           if (!mounted) {
             return;
           }
@@ -287,6 +305,18 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         followers: _enteredFollowersQuantity,
         description: _enteredDescription,
       ));
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
     } catch (e) {
       if (!mounted) {
         return;
@@ -406,14 +436,6 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
                           value.trim().length > 300) {
                         return 'Deve ter entre 1 e 300 caracteres';
                       }
-
-                      // final imageRegex = RegExp(
-                      //   r'^(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)$',
-                      // );
-
-                      // if (!imageRegex.hasMatch(value)) {
-                      //   return "URL Inválida";
-                      // }
 
                       return null;
                     },

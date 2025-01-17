@@ -61,6 +61,7 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
           _artists = [];
           _isLoadingArtistsError = null;
         });
+
         return;
       }
 
@@ -82,11 +83,12 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
         _artists = loadedItems;
         _isLoadingArtistsError = null;
       });
+    } on http.ClientException catch (_) {
+      setState(() {
+        _artists = [];
+        _isLoadingArtistsError = "Verifique a sua conexão com a internet.";
+      });
     } catch (e) {
-      if (!mounted) {
-        return;
-      }
-
       setState(() {
         _artists = [];
         _isLoadingArtistsError = e.toString().replaceAll("Exception: ", "");
@@ -123,10 +125,12 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
       ),
     );
 
+    // If the artist wasn't deleted or edited
     if (editedRemovedArtist == null) {
       return;
     }
 
+    // Handles artist deletion
     if (editedRemovedArtist is bool && editedRemovedArtist) {
       setState(() {
         _artists = _artists.where((item) => item.id != artist.id).toList();
@@ -134,6 +138,7 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
       return;
     }
 
+    // Handles artist edition
     final oldArtistIndex = _artists.indexWhere(
       (item) => item.id == editedRemovedArtist.id,
     );

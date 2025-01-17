@@ -54,11 +54,7 @@ class _SongItemState extends ConsumerState<SongItem> {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: json.encode(
-          {
-            'favorited': true
-          }
-        ),
+        body: json.encode({'favorited': true}),
       );
 
       if (response.statusCode > 400) {
@@ -90,8 +86,22 @@ class _SongItemState extends ConsumerState<SongItem> {
             ),
           ),
         );
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
@@ -159,8 +169,22 @@ class _SongItemState extends ConsumerState<SongItem> {
             ),
           ),
         );
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
@@ -206,14 +230,13 @@ class _SongItemState extends ConsumerState<SongItem> {
                 child: Wrap(
                   children: <Widget>[
                     ListTile(
-                      leading: const Icon(Icons.favorite),
-                      title: favoriteSongsNotifier.isFavorite(widget.song)
-                          ? const Text('Remover dos Favoritos')
-                          : const Text("Adicionar aos favoritos"),
-                      onTap: favoriteSongsNotifier.isFavorite(widget.song)
-                       ? () => _removeFavoriteSong()
-                       : () => _addFavoriteSong()
-                    ),
+                        leading: const Icon(Icons.favorite),
+                        title: favoriteSongsNotifier.isFavorite(widget.song)
+                            ? const Text('Remover dos Favoritos')
+                            : const Text("Adicionar aos favoritos"),
+                        onTap: favoriteSongsNotifier.isFavorite(widget.song)
+                            ? () => _removeFavoriteSong()
+                            : () => _addFavoriteSong()),
                     if (widget.showDataManipulationActions)
                       Column(
                         children: [

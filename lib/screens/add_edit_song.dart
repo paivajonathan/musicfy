@@ -117,10 +117,30 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
           favoritedBy: [],
         ),
       );
-    } catch (e) {
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll("Exception: ", "")),
+          ),
+        );
     } finally {
       setState(() {
         _isButtonLoading = false;
@@ -164,7 +184,8 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
       final getSongsResponseData = json.decode(getSongsResponse.body);
 
       for (final item in getSongsResponseData.entries) {
-        if (item.value["title"] == _enteredTitle && item.key != widget.songData!.id) {
+        if (item.value["title"] == _enteredTitle &&
+            item.key != widget.songData!.id) {
           if (!mounted) {
             return;
           }
@@ -206,8 +227,11 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(const SnackBar(
-            content: Text("Informações da música editadas com sucesso.")));
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Informações da música editadas com sucesso."),
+          ),
+        );
 
       Navigator.of(context).pop(
         SongModel(
@@ -218,10 +242,30 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
           favoritedBy: widget.songData!.favoritedBy,
         ),
       );
-    } catch (e) {
+    } on http.ClientException catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("Verifique a sua conexão com a internet."),
+          ),
+        );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll("Exception: ", "")),
+          ),
+        );
     } finally {
       setState(() {
         _isButtonLoading = false;
@@ -239,7 +283,7 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
         appBar: AppBar(
           title: widget.songData != null
               ? const Text("Editar Música")
-              : const Text("Editar Música"),
+              : const Text("Adicionar Música"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(20),
