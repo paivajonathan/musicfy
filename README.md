@@ -23,28 +23,70 @@ Para cada requisito extra implementado, um requisito minimo poderá ser desconsi
 
 ## Demonstração das Telas
 
-### Artistas
+### Tela Login
 
 <p align="center">
-  <img src="screenshots/Artistas.jpeg" alt="Artistas" width="350">
+  <img src="screenshots/TelaLogin.jpeg" alt="Tela Login" width="350">
 </p>
 
-### Detalhes Artista
+### Tela Cadastro
 
 <p align="center">
-  <img src="screenshots/DetalhesArtista.jpeg" alt="Detalhes Artista" width="350">
+  <img src="screenshots/TelaCadastro.jpeg" alt="Tela Cadastro" width="350">
 </p>
 
-### Ranking
+### Tela Artistas
 
 <p align="center">
-  <img src="screenshots/Ranking.jpeg" alt="Ranking" width="350">
+  <img src="screenshots/TelaArtistas.jpeg" alt="Tela Artistas" width="350">
 </p>
 
-### Sobre
+### Tela Adicionar Artista
 
 <p align="center">
-  <img src="screenshots/Sobre.jpeg" alt="Sobre" width="350">
+  <img src="screenshots/TelaAdicionarArtista.jpeg" alt="Tela Adicionar Artista" width="350">
+</p>
+
+### Tela Favoritos
+
+<p align="center">
+  <img src="screenshots/TelaFavoritos.jpeg" alt="Tela Favoritos" width="350">
+</p>
+
+### Tela Detalhes Artista
+
+<p align="center">
+  <img src="screenshots/TelaDetalhesArtista.jpeg" alt="Tela Detalhes Artista" width="350">
+</p>
+
+### Tela Editar Artista
+
+<p align="center">
+  <img src="screenshots/TelaEditarArtista.jpeg" alt="Tela Editar Artista" width="350">
+</p>
+
+### Tela Adicionar Musica
+
+<p align="center">
+  <img src="screenshots/TelaAdicionarMusica.jpeg" alt="Tela Adicionar Musica" width="350">
+</p>
+
+### Tela Editar Musica
+
+<p align="center">
+  <img src="screenshots/TelaEditarMusica.jpeg" alt="Tela Editar Musica" width="350">
+</p>
+
+### Drawer
+
+<p align="center">
+  <img src="screenshots/Drawer.jpeg" alt="Drawer" width="350">
+</p>
+
+### Tela Sobre
+
+<p align="center">
+  <img src="screenshots/TelaSobre.jpeg" alt="Tela Sobre" width="350">
 </p>
 
 ## Componentes
