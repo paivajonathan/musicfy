@@ -50,7 +50,7 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              "1.0.0",
+              "1.0.1",
               style: Theme.of(context).textTheme.bodyLarge!,
             ),       
             const SizedBox(height: 20),
@@ -88,7 +88,7 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),    
             Text(
-              "© 2024",
+              "© 2025",
               style: Theme.of(context).textTheme.bodyLarge!,
             ),
           ],

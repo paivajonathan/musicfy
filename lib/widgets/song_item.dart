@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trabalho1/helpers/formatters.dart';
 import 'package:trabalho1/models/song.dart';
+import 'package:http/http.dart' as http;
 import 'package:trabalho1/providers/favorite_songs.dart';
+import 'package:trabalho1/providers/user_data.dart';
 
-class SongItem extends ConsumerWidget {
+class SongItem extends ConsumerStatefulWidget {
   const SongItem({
     super.key,
     required this.song,
@@ -23,15 +27,175 @@ class SongItem extends ConsumerWidget {
   final void Function()? onDelete;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final subtitle = formatNumber(song.streamsCount) +
-        (showArtist ? " | ${song.artistName}" : "");
+  ConsumerState<SongItem> createState() => _SongItemState();
+}
+
+class _SongItemState extends ConsumerState<SongItem> {
+  bool _isTogglingFavorite = false;
+
+  Future<void> _addFavoriteSong() async {
+    if (_isTogglingFavorite) {
+      return;
+    }
+
+    try {
+      final userDataState = ref.watch(userDataProvider);
+      final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
+
+      setState(() {
+        _isTogglingFavorite = true;
+      });
+
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'users/${userDataState!.id}/favoriteSongs/${widget.song.id}.json',
+      );
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(
+          {
+            'title': widget.song.title,
+            'streamsCount': widget.song.streamsCount,
+            'artistId': widget.song.artistId,
+            'artistName': widget.song.artistName,
+          },
+        ),
+      );
+
+      if (response.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao adicionar música aos favoritos.",
+              ),
+            ),
+          );
+      }
+
+      favoriteSongsNotifier.addSong(widget.song);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Música adicionada aos favoritos.",
+            ),
+          ),
+        );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
+    } finally {
+      setState(() {
+        _isTogglingFavorite = false;
+      });
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _removeFavoriteSong() async {
+    if (_isTogglingFavorite) {
+      return;
+    }
+
+    try {
+      final userDataState = ref.watch(userDataProvider);
+      final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
+
+      setState(() {
+        _isTogglingFavorite = true;
+      });
+
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'users/${userDataState!.id}/favoriteSongs/${widget.song.id}.json',
+      );
+
+      final response = await http.delete(url);
+
+      if (response.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao remover música dos favoritos.",
+              ),
+            ),
+          );
+      }
+
+      favoriteSongsNotifier.removeSong(widget.song);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Música removida dos favoritos.",
+            ),
+          ),
+        );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().replaceAll("Exception: ", ""),
+            ),
+          ),
+        );
+    } finally {
+      setState(() {
+        _isTogglingFavorite = false;
+      });
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
+
+    final subtitle = formatNumber(widget.song.streamsCount) +
+        (widget.showArtist ? " | ${widget.song.artistName}" : "");
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading:
-          Text((index + 1).toString(), style: const TextStyle(fontSize: 20)),
-      title: Text(song.title),
+      leading: Text((widget.index + 1).toString(),
+          style: const TextStyle(fontSize: 20)),
+      title: Text(widget.song.title),
       subtitle: Text(
         subtitle,
         maxLines: 1,
@@ -49,41 +213,25 @@ class SongItem extends ConsumerWidget {
                   children: <Widget>[
                     ListTile(
                       leading: const Icon(Icons.favorite),
-                      title: ref
-                              .read(favoriteSongsProvider.notifier)
-                              .isFavorite(song)
+                      title: favoriteSongsNotifier.isFavorite(widget.song)
                           ? const Text('Remover dos Favoritos')
                           : const Text("Adicionar aos favoritos"),
-                      onTap: () {
-                        ref
-                            .read(favoriteSongsProvider.notifier)
-                            .toggleSongFavoriteStatus(song);
-
-                        Navigator.of(context).pop();
-
-                        String message = ref
-                                .read(favoriteSongsProvider.notifier)
-                                .isFavorite(song)
-                            ? "Música adicionada aos Favoritos."
-                            : "Música removida dos Favoritos";
-
-                        ScaffoldMessenger.of(context)
-                          ..clearSnackBars()
-                          ..showSnackBar(SnackBar(content: Text(message)));
-                      },
+                      onTap: favoriteSongsNotifier.isFavorite(widget.song)
+                       ? () => _removeFavoriteSong()
+                       : () => _addFavoriteSong()
                     ),
-                    if (showDataManipulationActions)
+                    if (widget.showDataManipulationActions)
                       Column(
                         children: [
                           ListTile(
                             leading: const Icon(Icons.edit),
                             title: const Text('Editar Música'),
-                            onTap: onEdit,
+                            onTap: widget.onEdit,
                           ),
                           ListTile(
                             leading: const Icon(Icons.delete),
                             title: const Text('Excluir Música'),
-                            onTap: onDelete,
+                            onTap: widget.onDelete,
                           ),
                         ],
                       )

@@ -8,12 +8,11 @@ class FavoriteSongsNotifier extends StateNotifier<List<SongModel>> {
     return (state.indexWhere((favoriteSong) => favoriteSong.id == song.id) != -1);
   }
 
-  void toggleSongFavoriteStatus(SongModel song) {
-    if (isFavorite(song)) {
-      removeSong(song);
-      return;
-    } 
+  void addSongs(List<SongModel> songs) {
+    state = [...state, ...songs];
+  }
 
+  void addSong(SongModel song) {
     state = [...state, song];
   }
 
@@ -34,6 +33,10 @@ class FavoriteSongsNotifier extends StateNotifier<List<SongModel>> {
 
   void removeSong(SongModel songToRemove) {
     state = state.where((song) => song.id != songToRemove.id).toList();
+  }
+
+  void removeSongs() {
+    state = [];
   }
 }
 

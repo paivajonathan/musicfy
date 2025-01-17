@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:trabalho1/helpers/validators.dart';
+import 'package:trabalho1/models/song.dart';
 import 'package:trabalho1/models/user.dart';
+import 'package:trabalho1/providers/favorite_songs.dart';
 import 'package:trabalho1/providers/user_data.dart';
 import 'package:trabalho1/screens/register.dart';
 import 'package:trabalho1/screens/tabs.dart';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -26,6 +31,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isGoogleButtonLoading = false;
 
   Future<void> _login() async {
+    final userDataNotifier = ref.read(userDataProvider.notifier);
+    final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -43,13 +51,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         password: _enteredPassword,
       );
 
-      ref.read(userDataProvider.notifier).addUserData(
-            UserModel(
-              id: userCredential.user!.uid,
-              email: userCredential.user!.email!,
-              name: userCredential.user!.displayName ?? "Sem nome",
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'users/${userCredential.user!.uid}/favoriteSongs.json',
+      );
+
+      final response = await http.get(url);
+
+      if (response.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text("Ocorreu um erro inesperado ao realizar login."),
             ),
           );
+
+        return;
+      }
+
+      final responseData = json.decode(response.body);
+
+      List<SongModel> favoriteSongs = [];
+
+      if (responseData != null) {
+        for (final item in responseData.entries) {
+          favoriteSongs.add(SongModel(
+            id: item.key,
+            title: item.value["title"],
+            streamsCount: item.value["streamsCount"],
+            artistId: item.value["artistId"],
+            artistName: item.value["artistName"],
+          ));
+        }
+      }
+
+      userDataNotifier.addUserData(
+        UserModel(
+          id: userCredential.user!.uid,
+          email: userCredential.user!.email!,
+          name: userCredential.user!.displayName ?? "Sem nome",
+        ),
+      );
+
+      favoriteSongsNotifier.addSongs(favoriteSongs);
 
       if (!mounted) {
         return;
@@ -102,6 +151,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _googleLogin() async {
+    final userDataNotifier = ref.read(userDataProvider.notifier);
+    final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
+
     try {
       setState(() {
         _isGoogleButtonLoading = true;
@@ -123,13 +175,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
-      ref.read(userDataProvider.notifier).addUserData(
-            UserModel(
-              id: userCredential.user!.uid,
-              email: userCredential.user!.email!,
-              name: userCredential.user!.displayName!,
+      final url = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'users/${userCredential.user!.uid}/favoriteSongs.json',
+      );
+
+      final response = await http.get(url);
+
+      if (response.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text("Ocorreu um erro inesperado ao realizar login."),
             ),
           );
+
+        return;
+      }
+
+      final responseData = json.decode(response.body);
+
+      List<SongModel> favoriteSongs = [];
+
+      if (responseData != null) {
+        for (final item in responseData.entries) {
+          favoriteSongs.add(SongModel(
+            id: item.key,
+            title: item.value["title"],
+            streamsCount: item.value["streamsCount"],
+            artistId: item.value["artistId"],
+            artistName: item.value["artistName"],
+          ));
+        }
+      }
+
+      userDataNotifier.addUserData(
+        UserModel(
+          id: userCredential.user!.uid,
+          email: userCredential.user!.email!,
+          name: userCredential.user!.displayName!,
+        ),
+      );
+
+      favoriteSongsNotifier.addSongs(favoriteSongs);
 
       if (!mounted) {
         return;
