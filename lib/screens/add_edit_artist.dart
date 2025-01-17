@@ -65,7 +65,47 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         'artists.json',
       );
 
-      final response = await http.post(
+      final getArtistsResponse = await http.get(url);
+
+      if (getArtistsResponse.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao adicionar um artista.",
+              ),
+            ),
+          );
+      }
+
+      final getArtistsResponseData = json.decode(getArtistsResponse.body);
+
+      for (final item in getArtistsResponseData.entries) {
+        if (item.value["name"] == _enteredName) {
+          if (!mounted) {
+            return;
+          }
+
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Já existe um outro artista com esse nome.",
+                ),
+              ),
+            );
+
+          return;
+        }
+      }
+
+      final createUserResponse = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
@@ -80,14 +120,35 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         ),
       );
 
-      final data = json.decode(response.body);
+      if (createUserResponse.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao adicionar um artista.",
+              ),
+            ),
+          );
+      }
+
+      final data = json.decode(createUserResponse.body);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
-            const SnackBar(content: Text("Artista adicionado com sucesso.")));
+          const SnackBar(
+            content: Text(
+              "Artista adicionado com sucesso.",
+            ),
+          ),
+        );
 
       Navigator.of(context).pop(ArtistModel(
         id: data["name"],
@@ -97,9 +158,14 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
         description: _enteredDescription,
       ));
     } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text(e.toString())));
+        ..showSnackBar(SnackBar(
+            content: Text(e.toString().replaceAll("Exception: ", ""))));
     } finally {
       setState(() {
         _isButtonLoading = false;
@@ -136,6 +202,51 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
       setState(() {
         _isButtonLoading = true;
       });
+
+      final getArtistsUrl = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'artists.json',
+      );
+
+      final getArtistsResponse = await http.get(getArtistsUrl);
+
+      if (getArtistsResponse.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao adicionar um artista.",
+              ),
+            ),
+          );
+      }
+
+      final getArtistsResponseData = json.decode(getArtistsResponse.body);
+
+      for (final item in getArtistsResponseData.entries) {
+        if (item.value["name"] == _enteredName && item.key != widget.artistData!.id) {
+          if (!mounted) {
+            return;
+          }
+
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Já existe um outro artista com esse nome.",
+                ),
+              ),
+            );
+
+          return;
+        }
+      }
 
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
