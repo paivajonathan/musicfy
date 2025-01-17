@@ -15,6 +15,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   var _enteredName = "";
   var _enteredEmail = "";
   var _enteredPassword = "";
+  var _enteredPasswordConfirmation = "";
+
+  bool _isPasswordVisible = false;
+  bool _isPasswordConfirmationVisible = false;
 
   bool _isButtonLoading = false;
 
@@ -140,12 +144,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _enteredName = value!;
                     },
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     maxLength: 100,
                     decoration: const InputDecoration(
                       label: Text('Email'),
                     ),
                     initialValue: _enteredEmail,
+                    keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
@@ -163,23 +171,87 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _enteredEmail = value!;
                     },
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     maxLength: 50,
-                    decoration: const InputDecoration(
-                      label: Text('Senha'),
+                    decoration: InputDecoration(
+                      label: const Text('Senha'),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
                     ),
+                    obscureText: !_isPasswordVisible,
                     initialValue: _enteredPassword,
-                    obscureText: true,
                     validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          value.trim().length > 50) {
-                        return 'Deve ter entre 1 e 50 caracteres';
+                      if (value == null || value.isEmpty || value.trim().length < 8) {
+                        return 'Deve ter pelo menos 8 caracteres.';
                       }
+
+                      if (value.trim().length > 50) {
+                        return 'Deve ter no máximo 50 caracteres';
+                      }
+
+                      if (value != _enteredPasswordConfirmation) {
+                        return 'As senhas não coincidem';
+                      }
+
                       return null;
                     },
-                    onSaved: (value) {
-                      _enteredPassword = value!;
+                    onChanged: (value) {
+                      _enteredPassword = value;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                      label: const Text('Confirmação de Senha'),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordConfirmationVisible =
+                                !_isPasswordConfirmationVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isPasswordConfirmationVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
+                    ),
+                    obscureText: !_isPasswordConfirmationVisible,
+                    initialValue: _enteredPasswordConfirmation,
+                    validator: (value) {
+                      if (value == null || value.isEmpty || value.trim().length < 8) {
+                        return 'Deve ter pelo menos 8 caracteres.';
+                      }
+
+                      if (value.trim().length > 50) {
+                        return 'Deve ter no máximo 50 caracteres';
+                      }
+
+                      if (value != _enteredPassword) {
+                        return 'As senhas não coincidem';
+                      }
+
+                      return null;
+                    },
+                    onChanged: (value) {
+                      _enteredPasswordConfirmation = value;
                     },
                   ),
                   const SizedBox(

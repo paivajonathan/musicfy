@@ -20,6 +20,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   var _enteredEmail = "";
   var _enteredPassword = "";
+  bool _isPasswordVisible = false;
 
   bool _isButtonLoading = false;
   bool _isGoogleButtonLoading = false;
@@ -180,6 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     decoration: const InputDecoration(
                       label: Text('Email'),
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     initialValue: _enteredEmail,
                     validator: (value) {
                       if (value == null ||
@@ -198,19 +200,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _enteredEmail = value!;
                     },
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     maxLength: 50,
-                    decoration: const InputDecoration(
-                      label: Text('Senha'),
+                    decoration: InputDecoration(
+                      label: const Text('Senha'),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
                     ),
+                    obscureText: !_isPasswordVisible,
                     initialValue: _enteredPassword,
-                    obscureText: true,
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
-                          value.trim().length > 50) {
-                        return 'Deve ter entre 1 e 50 caracteres';
+                          value.trim().length < 8) {
+                        return 'Deve ter pelo menos 8 caracteres.';
                       }
+
+                      if (value.trim().length > 50) {
+                        return 'Deve ter no máximo 50 caracteres';
+                      }
+
                       return null;
                     },
                     onSaved: (value) {
