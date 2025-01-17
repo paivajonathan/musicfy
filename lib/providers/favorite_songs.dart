@@ -4,18 +4,17 @@ import 'package:trabalho1/models/song.dart';
 class FavoriteSongsNotifier extends StateNotifier<List<SongModel>> {
   FavoriteSongsNotifier() : super([]);
 
-  void toggleSongFavoriteStatus(SongModel song) {
-    final mealIsFavorite = state.contains(song);
-
-    if (mealIsFavorite) {
-      state = state.where((s) => s.id != song.id).toList();
-    } else {
-      state = [...state, song];
-    }
+  bool isFavorite(SongModel song) {
+    return (state.indexWhere((favoriteSong) => favoriteSong.id == song.id) != -1);
   }
 
-  bool isFavorite(SongModel song) {
-    return state.contains(song);
+  void toggleSongFavoriteStatus(SongModel song) {
+    if (isFavorite(song)) {
+      removeSong(song);
+      return;
+    } 
+
+    state = [...state, song];
   }
 
   void updateSong(SongModel updatedSong) {
