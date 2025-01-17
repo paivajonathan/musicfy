@@ -286,57 +286,92 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
   Future<void> _handleArtistDelete() async {
     Navigator.of(context).pop();
 
-    if (_songs.isNotEmpty) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Não é possível excluir o artista, pois possui músicas relacionadas.",
-            ),
-          ),
-        );
-
-      return;
-    }
-
-    final result = await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmação'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Tem certeza de que'),
-                Text('deseja excluir esse artista?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancelar'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            TextButton(
-              child: const Text('Excluir'),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      },
-    );
-
-    if (result == null || !result) {
-      return;
-    }
-
     try {
+      final getSongsUrl = Uri.https(
+        'musicfy-72db4-default-rtdb.firebaseio.com',
+        'songs.json',
+      );
+
+      final getSongsResponse = await http.get(getSongsUrl);
+
+      if (getSongsResponse.statusCode > 400) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Ocorreu um erro inesperado ao excluir um artista.",
+              ),
+            ),
+          );
+      }
+
+      final getSongsResponseData = json.decode(getSongsResponse.body);
+
+      for (final item in getSongsResponseData.entries) {
+        if (item.value["artistId"] == _artistData.id) {
+          if (!mounted) {
+            return;
+          }
+
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                  "Não é possível excluir o artista, pois possui músicas relacionadas.",
+                ),
+              ),
+            );
+
+          return;
+        }
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirmação'),
+            content: const SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('Tem certeza de que'),
+                  Text('deseja excluir esse artista?'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              TextButton(
+                child: const Text('Excluir'),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      if (result == null || !result) {
+        return;
+      }
+
       final url = Uri.https(
         'musicfy-72db4-default-rtdb.firebaseio.com',
         'artists/${_artistData.id}.json',
@@ -446,7 +481,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
           if (_wasEdited) {
             Navigator.of(context).pop(_artistData);
             return;
-          } 
+          }
 
           Navigator.of(context).pop();
         },
