@@ -154,11 +154,25 @@ class _ArtistsScreenState extends State<ArtistsScreen> {
     }
 
     if (_isLoadingArtistsError != null) {
-      return Center(child: Text(_isLoadingArtistsError!));
+      return Stack(
+        children: <Widget>[
+          Center(
+            child: Text(_isLoadingArtistsError!),
+          ),
+          ListView()
+        ],
+      );
     }
 
     if (_artists.isEmpty) {
-      return const Center(child: Text("Não há artistas cadastrados"));
+      return Stack(
+        children: <Widget>[
+          const Center(
+            child: Text("Não há artistas cadastrados"),
+          ),
+          ListView()
+        ],
+      );
     }
 
     final sortedArtists = _artists;
