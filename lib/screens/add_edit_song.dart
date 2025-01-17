@@ -65,7 +65,7 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
 
       final getSongsResponseData = json.decode(getSongsResponse.body);
 
-      for (final item in getSongsResponseData.entries) {
+      for (final item in (getSongsResponseData ?? {}).entries) {
         if (item.value["title"] == _enteredTitle) {
           if (!mounted) {
             return;
@@ -183,7 +183,7 @@ class _AddSongScreenState extends State<AddEditSongScreen> {
 
       final getSongsResponseData = json.decode(getSongsResponse.body);
 
-      for (final item in getSongsResponseData.entries) {
+      for (final item in (getSongsResponseData ?? {}).entries) {
         if (item.value["title"] == _enteredTitle &&
             item.key != widget.songData!.id) {
           if (!mounted) {

@@ -335,7 +335,7 @@ class _ArtistDetailsScreenState extends ConsumerState<ArtistDetailsScreen> {
 
       final getSongsResponseData = json.decode(getSongsResponse.body);
 
-      for (final item in getSongsResponseData.entries) {
+      for (final item in (getSongsResponseData ?? {}).entries) {
         if (item.value["artistId"] == _artistData.id) {
           if (!mounted) {
             return;

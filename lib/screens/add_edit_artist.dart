@@ -85,7 +85,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
       final getArtistsResponseData = json.decode(getArtistsResponse.body);
 
-      for (final item in getArtistsResponseData.entries) {
+      for (final item in (getArtistsResponseData ?? {}).entries) {
         if (item.value["name"] == _enteredName) {
           if (!mounted) {
             return;
@@ -245,7 +245,7 @@ class _AddEditArtistScreenState extends State<AddEditArtistScreen> {
 
       final getArtistsResponseData = json.decode(getArtistsResponse.body);
 
-      for (final item in getArtistsResponseData.entries) {
+      for (final item in (getArtistsResponseData ?? {}).entries) {
         if (item.value["name"] == _enteredName &&
             item.key != widget.artistData!.id) {
           if (!mounted) {
