@@ -36,6 +36,8 @@ class _SongItemState extends ConsumerState<SongItem> {
       return;
     }
 
+    Navigator.of(context).pop();
+
     try {
       final userDataState = ref.watch(userDataProvider);
       final favoriteSongsNotifier = ref.read(favoriteSongsProvider.notifier);
@@ -116,7 +118,6 @@ class _SongItemState extends ConsumerState<SongItem> {
       setState(() {
         _isTogglingFavorite = false;
       });
-      Navigator.of(context).pop();
     }
   }
 
@@ -124,6 +125,8 @@ class _SongItemState extends ConsumerState<SongItem> {
     if (_isTogglingFavorite) {
       return;
     }
+
+    Navigator.of(context).pop();
 
     try {
       final userDataState = ref.watch(userDataProvider);
@@ -199,7 +202,6 @@ class _SongItemState extends ConsumerState<SongItem> {
       setState(() {
         _isTogglingFavorite = false;
       });
-      Navigator.of(context).pop();
     }
   }
 
@@ -220,44 +222,54 @@ class _SongItemState extends ConsumerState<SongItem> {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: IconButton(
-        icon: const Icon(Icons.more_vert),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (BuildContext bc) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Wrap(
-                  children: <Widget>[
-                    ListTile(
-                        leading: const Icon(Icons.favorite),
-                        title: favoriteSongsNotifier.isFavorite(widget.song)
-                            ? const Text('Remover dos Favoritos')
-                            : const Text("Adicionar aos favoritos"),
-                        onTap: favoriteSongsNotifier.isFavorite(widget.song)
-                            ? () => _removeFavoriteSong()
-                            : () => _addFavoriteSong()),
-                    if (widget.showDataManipulationActions)
-                      Column(
-                        children: [
+        icon: _isTogglingFavorite
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(),
+              )
+            : const Icon(Icons.more_vert),
+        onPressed: _isTogglingFavorite
+            ? null
+            : () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext bc) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Wrap(
+                        children: <Widget>[
                           ListTile(
-                            leading: const Icon(Icons.edit),
-                            title: const Text('Editar Música'),
-                            onTap: widget.onEdit,
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.delete),
-                            title: const Text('Excluir Música'),
-                            onTap: widget.onDelete,
-                          ),
+                              leading: const Icon(Icons.favorite),
+                              title:
+                                  favoriteSongsNotifier.isFavorite(widget.song)
+                                      ? const Text('Remover dos Favoritos')
+                                      : const Text("Adicionar aos favoritos"),
+                              onTap:
+                                  favoriteSongsNotifier.isFavorite(widget.song)
+                                      ? () => _removeFavoriteSong()
+                                      : () => _addFavoriteSong()),
+                          if (widget.showDataManipulationActions)
+                            Column(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.edit),
+                                  title: const Text('Editar Música'),
+                                  onTap: widget.onEdit,
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.delete),
+                                  title: const Text('Excluir Música'),
+                                  onTap: widget.onDelete,
+                                ),
+                              ],
+                            )
                         ],
-                      )
-                  ],
-                ),
-              );
-            },
-          );
-        },
+                      ),
+                    );
+                  },
+                );
+              },
       ),
     );
   }
