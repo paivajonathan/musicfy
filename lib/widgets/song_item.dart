@@ -215,7 +215,11 @@ class _SongItemState extends ConsumerState<SongItem> {
       contentPadding: EdgeInsets.zero,
       leading: Text((widget.index + 1).toString(),
           style: const TextStyle(fontSize: 20)),
-      title: Text(widget.song.title),
+      title: Text(
+        widget.song.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: Text(
         subtitle,
         maxLines: 1,
